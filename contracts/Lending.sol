@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
-/* import "../installed_contracts/jsmnsol-lib/contracts/JsmnSolLib.sol";
+import "../installed_contracts/jsmnsol-lib/contracts/JsmnSolLib.sol";
 import "../installed_contracts/bytesutils.sol";
-import "../installed_contracts/tlsnutils.sol"; */
+import "../installed_contracts/tlsnutils.sol";
 
 contract Lending {
 
