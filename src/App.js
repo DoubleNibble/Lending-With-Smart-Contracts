@@ -7,6 +7,47 @@ import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
 
+class Loan {
+    constructor(id) {
+	this.id = id
+    }
+}
+
+class LoanView extends Component {
+    constructor(props) {
+	super(props)
+    }
+    render() {
+	return(<p>Loan {this.props.loan.id} </p>)
+    }
+}
+
+class LoanList extends Component {
+    constructor(props) {
+	super(props)
+    }
+    render() {
+	return (
+		<div>
+		{this.props.loans.map( function(loan) {
+		    return <LoanView key={loan.id} loan={loan} />
+		}.bind(this))}
+	    </div>
+	)
+    }
+}
+
+
+class LoanCreator extends Component {
+    constructor(props) {
+	super(props)
+    }
+    render() {
+	return (<div>Create here <button onClick={() => {this.props.addNewLoan()}}>Add New Loan</button></div> )
+    }
+}
+
+
 class App extends Component {
     constructor(props) {
 	super(props)
@@ -42,7 +83,7 @@ class App extends Component {
 		    console.log("lending change event triggered")
 		    this.getAllLoans()
 		}.bind(this)
-		this.event = this.lendingContractInst.LendingCoverChange()
+		this.event = this.lendingContractInst.LendingContractChange()
 		return this.event.watch(getLoans)
 	    }).then( (result) => {
 		// Create a function that regularly checks for changes to account
@@ -69,6 +110,11 @@ class App extends Component {
 
     async getAllLoans() {
 	console.log("getting loans")
+	console.log(await this.lendingContractInst.getLendingIds())
+    }
+
+    addNewLoan() {
+	this.lendingContractInst.borrowFunds(1, 2, 1, 1, {from:this.currAccount}) 
     }
 
     render() {
@@ -81,7 +127,7 @@ class App extends Component {
 		<main className="container">
 		<div className="pure-g">
 		<div className="pure-u-1-1">
-		<h1>Good to Go!</h1>
+		<LoanCreator addNewLoan={this.addNewLoan.bind(this)}/>
 		</div>
 		</div>
 		</main>

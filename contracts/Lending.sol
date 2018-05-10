@@ -137,6 +137,10 @@ contract Lending {
     allAssets[_assetID].value = _new_value;
   }
 
+  function getLendingIds() public constant returns (uint[]) {
+    return lendingIDs;
+  }
+
   /***********************************/
   /******** PRIVATE FUNCTIONS ********/
   /***********************************/
