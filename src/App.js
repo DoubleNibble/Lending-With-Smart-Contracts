@@ -113,8 +113,14 @@ class App extends Component {
 	console.log(await this.lendingContractInst.getLendingIds())
     }
 
-    addNewLoan() {
-	this.lendingContractInst.borrowFunds(1, 2, 1, 1, {from:this.currAccount}) 
+    async addNewLoan() {
+	console.log(await this.lendingContractInst.getAssetIds())
+	this.lendingContractInst.borrowFunds(1001, 2, 1, 1, {from:this.currAccount}) 
+    }
+
+    addNewAsset(value) {
+	console.log(this.currAccount);
+	this.lendingContractInst.addAsset(this.currAccount, value, {from:this.currAccount});
     }
 
     render() {
@@ -128,6 +134,7 @@ class App extends Component {
 		<div className="pure-g">
 		<div className="pure-u-1-1">
 		<LoanCreator addNewLoan={this.addNewLoan.bind(this)}/>
+		<button onClick={() => {this.addNewAsset(1)}}>Add New Asset </button>
 		</div>
 		</div>
 		</main>

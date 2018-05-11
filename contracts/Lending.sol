@@ -141,6 +141,10 @@ contract Lending {
     return lendingIDs;
   }
 
+  function getAssetIds() public constant returns (uint[]) {
+    return assetIDs;
+  }
+
   /***********************************/
   /******** PRIVATE FUNCTIONS ********/
   /***********************************/
