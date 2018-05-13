@@ -67,7 +67,9 @@ contract Lending {
     assetCount = 0;
   }
 
-  function borrowFunds(uint _assetID, uint borrowAmount, /*bytes memory _hex_proof,*/ uint _premium, uint _lending_period) public payable {
+  // Done
+  // /*bytes memory _hex_proof,*/
+  function borrowFunds(uint _assetID, uint borrowAmount, uint _premium, uint _lending_period) public payable {
     require(!allAssets[_assetID].borrowedAgainst);
     require(allAssets[_assetID].value >= borrowAmount);
     require(allAssets[_assetID].owner == msg.sender);
@@ -86,6 +88,7 @@ contract Lending {
 
   function lendFunds(uint _lendingID) public payable {
     require(msg.value == allLendingContracts[_lendingID].borrowedAmount);
+    require(!allLendingContracts[_lendingID].filled);
     allLendingContracts[_lendingID].proposer.transfer(msg.value);
     allLendingContracts[_lendingID].filled = true;
     allLendingContracts[_lendingID].acceptor = msg.sender;
@@ -117,6 +120,7 @@ contract Lending {
     allLendingContracts[_lendingID].deleted = true;
   }
 
+  // Done
   function addAsset(address _owner, uint _value) public isOwner {
     uint assetID = (assetCount++)+1000;
     assetIDs.push(assetID);
@@ -124,25 +128,35 @@ contract Lending {
     AssetChange(assetID);
   }
 
-  function removeOwnership(uint _assetID) public isOwner {
-    allAssets[_assetID].owner = 0;
-  }
-
+  // Done
   function transferOwnership(address _recipient, uint _assetID) public {
     require(allAssets[_assetID].owner == msg.sender || msg.sender == master);
     allAssets[_assetID].owner = _recipient;
   }
 
+  // Done
   function changeValue(uint _assetID, uint _new_value) public isOwner {
     allAssets[_assetID].value = _new_value;
   }
 
+  // Done
   function getLendingIds() public constant returns (uint[]) {
     return lendingIDs;
   }
 
+  // Done
   function getAssetIds() public constant returns (uint[]) {
     return assetIDs;
+  }
+
+  // Done
+  function getLendingContractCount() public constant returns (uint) {
+    return lendingContractCount;
+  }
+
+  // Done
+  function getAssetCount() public constant returns (uint) {
+    return assetCount;
   }
 
   /***********************************/
