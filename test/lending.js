@@ -1,3 +1,5 @@
+import expectThrow from '../helpers/expectThrow';
+
 var Lending = artifacts.require("Lending");
 
 contract('Lending', function(accounts, app) {
@@ -25,10 +27,7 @@ contract('Lending', function(accounts, app) {
 
     return Lending.deployed().then(function(instance) {
       app = instance;
-      app.addAsset(adder, value, {from: adder, value: 0});
-      return instance.getAssetCount();
-    }).then(function(assets) {
-      assert.equal(assets.valueOf(), 0, "A random user was able to add an asset");
+      return expectThrow(app.addAsset(adder, value, {from: adder, value: 0}));
     });
   });
 
@@ -54,14 +53,14 @@ contract('Lending', function(accounts, app) {
     var app;
     var contractOwner = accounts[0];
     var assetID = 1000;
-    var newValue = 5;
+    var newValue = web3.toWei(5, "ether");
 
     return Lending.deployed().then(function(instance) {
       app = instance;
       app.changeValue(assetID, newValue, {from: contractOwner, value: 0});
       return app.allAssets(assetID);
     }).then(function(contract) {
-      assert.equal(contract[2].toNumber(), 5, "The value of the asset is wrong");
+      assert.equal(contract[2].toNumber(), newValue, "The value of the asset is wrong");
     })
   });
 
@@ -100,8 +99,8 @@ contract('Lending', function(accounts, app) {
     var app;
     var owner = accounts[3];
     var assetID = 1000;
-    var borrowAmount = 1;
-    var premium = 0.1;
+    var borrowAmount = web3.toWei(1, "ether");
+    var premium = web3.toWei(0.1, "ether");
     var lendingPeriod = 3;
 
     return Lending.deployed().then(function(instance) {
@@ -109,9 +108,24 @@ contract('Lending', function(accounts, app) {
       app.borrowFunds(assetID, borrowAmount, premium, lendingPeriod, {from: owner, value: premium});
       return app.getLendingContractCount();
     }).then(function(lending) {
-      assert.equal(lending.valueOf(), 0, "The number of lending contracts has not been incremented");
+      assert.equal(lending.valueOf(), 1, "The number of lending contracts has not been incremented");
     })
   });
 
+  it("The owner of an asset should be able to lend funds", function() {
+    var app;
+    var owner = accounts[4];
+    var lendingID = 1000;
+    var borrowAmount = web3.toWei(1, "ether");
+
+    return Lending.deployed().then(function(instance) {
+      app = instance;
+      app.lendFunds(lendingID, {from: owner, value: borrowAmount});
+      return app.allLendingContracts(lendingID);
+    }).then(function(lending) {
+      assert.equal(lending[9], true, "filled set to false");
+      assert.equal(lending[2], owner, "owner incorrect");
+    })
+  });
 
 });

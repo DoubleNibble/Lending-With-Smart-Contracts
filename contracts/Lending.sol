@@ -70,9 +70,9 @@ contract Lending {
   // Done
   // /*bytes memory _hex_proof,*/
   function borrowFunds(uint _assetID, uint borrowAmount, uint _premium, uint _lending_period) public payable {
-    /* require(!allAssets[_assetID].borrowedAgainst);
+    require(!allAssets[_assetID].borrowedAgainst);
     require(allAssets[_assetID].value >= borrowAmount);
-    require(allAssets[_assetID].owner == msg.sender); */
+    require(allAssets[_assetID].owner == msg.sender);
 
     // Work out the Bank of England Base Interest Rate from Hex Proof
 
@@ -88,6 +88,7 @@ contract Lending {
 
   function lendFunds(uint _lendingID) public payable {
     require(msg.value == allLendingContracts[_lendingID].borrowedAmount);
+    require(!allLendingContracts[_lendingID].filled);
     allLendingContracts[_lendingID].proposer.transfer(msg.value);
     allLendingContracts[_lendingID].filled = true;
     allLendingContracts[_lendingID].acceptor = msg.sender;
