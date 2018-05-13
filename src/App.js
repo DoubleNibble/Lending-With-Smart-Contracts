@@ -8,8 +8,12 @@ import './css/pure-min.css'
 import './App.css'
 
 class Loan {
-    constructor(id) {
+    constructor(id, timePeriod, amount, interestRatePremium, assetID) {
 	this.id = id
+	this.timePeriod = timePeriod
+	this.amount = amount
+	this.interestRatePremium = interestRatePremium
+	this.assetID = assetID
     }
 }
 
@@ -18,7 +22,15 @@ class LoanView extends Component {
 	super(props)
     }
     render() {
-	return(<p>Loan {this.props.loan.id} </p>)
+	var pStyle = function(width) {
+	    return {display:"inline-block", width:width+"px", "text-align":"center"}
+	}	
+	return(<div>
+	       <p style={pStyle(this.props.idWidth)}>{this.props.loan.id}</p>
+	       <p style={pStyle(this.props.assetIdWidth)}>{this.props.loan.assetID}</p>
+	       <p style={pStyle(this.props.amountWidth)}>{this.props.loan.amount}</p>
+	       <p style={pStyle(this.props.interestPremWidth)}>{this.props.loan.interestRatePremium}</p>
+	       </div>)
     }
 }
 
@@ -27,10 +39,22 @@ class LoanList extends Component {
 	super(props)
     }
     render() {
+	var idWidth = 80
+	var assetIdWidth = 80
+	var interestPremWidth = 150
+	var amountWidth = 110
+	var columnHeader = function(text, width) {
+	    return (<h4 style={{display:"inline-block", width:width+"px", "text-align":"center"}}>{text}</h4>)
+	}
 	return (
 		<div>
+		<h4>{this.props.header}</h4>
+		{columnHeader("ID", idWidth)}
+	    {columnHeader("Asset ID", assetIdWidth)}
+	    {columnHeader("Amount", amountWidth)}
+	    {columnHeader("Interest Premium", interestPremWidth)}
 		{this.props.loans.map( function(loan) {
-		    return <LoanView key={loan.id} loan={loan} />
+		    return <LoanView key={loan.id} loan={loan} idWidth={idWidth} assetIdWidth={assetIdWidth} amountWidth={amountWidth} interestPremWidth={interestPremWidth}/>
 		}.bind(this))}
 	    </div>
 	)
@@ -41,9 +65,27 @@ class LoanList extends Component {
 class LoanCreator extends Component {
     constructor(props) {
 	super(props)
+	this.state = {amount:0, interestRate:0}
+    }
+    setInterest(premium) {
+	if (parseFloat(premium)) {
+	    this.setState({interestRate: this.props.baseRate+parseFloat(premium)})
+	}
+    }
+    setAmount(amount) {
+	if (parseFloat(amount)) {
+	    this.setState({amount: parseFloat(amount)})
+	}
     }
     render() {
-	return (<div>Create here <button onClick={() => {this.props.addNewLoan()}}>Add New Loan</button></div> )
+	return (
+		<div>
+		Create here
+		<input placeholder={"Amount"} onChange={(e) => this.setAmount(e.target.value)}></input>
+		<input placeholder={"Interest Rate Premium"} onChange={(e) => this.setInterest(e.target.value)}></input>
+		<p>Requesting a loan for {this.state.amount} with interest rate {this.state.interestRate}</p>
+		<button onClick={() => {this.props.addNewLoan(this.state.amount, this.state.interestRatePremium, this.state.lendingPeriod, this.state.assetId)}}>Request Loan</button>
+	    </div> )
     }
 }
 
@@ -54,7 +96,8 @@ class App extends Component {
 
 	this.state = {
 	    storageValue: 0,
-	    web3: null
+	    web3: null,
+	    boeInterestRate: 0.2
 	}
     }
 
@@ -83,7 +126,7 @@ class App extends Component {
 		    console.log("lending change event triggered")
 		    this.getAllLoans()
 		}.bind(this)
-		this.event = this.lendingContractInst.LendingContractChange()
+		this.event = this.lendingContractInst.AssetChange()
 		return this.event.watch(getLoans)
 	    }).then( (result) => {
 		// Create a function that regularly checks for changes to account
@@ -110,10 +153,10 @@ class App extends Component {
 
     async getAllLoans() {
 	console.log("getting loans")
-	console.log(await this.lendingContractInst.getLendingIds())
+	console.log(await this.lendingContractInst.getAssetIds())
     }
 
-    async addNewLoan() {
+    async addNewLoan(amount, premium, lendingPeriod, assetId) {
 	console.log(await this.lendingContractInst.getAssetIds())
 	this.lendingContractInst.borrowFunds(1001, 2, 1, 1, {from:this.currAccount}) 
     }
@@ -133,8 +176,9 @@ class App extends Component {
 		<main className="container">
 		<div className="pure-g">
 		<div className="pure-u-1-1">
-		<LoanCreator addNewLoan={this.addNewLoan.bind(this)}/>
+		<LoanCreator addNewLoan={this.addNewLoan.bind(this)} baseRate={this.state.boeInterestRate}/>
 		<button onClick={() => {this.addNewAsset(1)}}>Add New Asset </button>
+		<LoanList loans={[new Loan(1,2,1,1,1001)]} header={"List 1"}/>
 		</div>
 		</div>
 		</main>
@@ -144,3 +188,9 @@ class App extends Component {
 }
 
 export default App
+
+
+/* Plan:
+ * - Show the BOE interest rate somewhere
+ * - New loan creator 
+*/
