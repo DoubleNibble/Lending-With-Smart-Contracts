@@ -123,7 +123,7 @@ class App extends Component {
 	    }).then( (result) => {
 		// Start watching for bet changes
 		var getLoans = function() {
-		    console.log("lending change event triggered")
+		    console.log("event triggered")
 		    this.getAllLoans()
 		}.bind(this)
 		this.event = this.lendingContractInst.AssetChange()
@@ -157,13 +157,15 @@ class App extends Component {
     }
 
     async addNewLoan(amount, premium, lendingPeriod, assetId) {
-	console.log(await this.lendingContractInst.getAssetIds())
-	this.lendingContractInst.borrowFunds(1001, 2, 1, 1, {from:this.currAccount}) 
+	console.log("hi")
+	console.log((await this.lendingContractInst.getAssetIds()))
+	this.lendingContractInst.borrowFunds(1000, 1, 1, 1, {from:this.currAccount}) 
     }
 
-    addNewAsset(value) {
+    async addNewAsset(value) {
 	console.log(this.currAccount);
-	this.lendingContractInst.addAsset(this.currAccount, value, {from:this.currAccount});
+	await this.lendingContractInst.addAsset(this.currAccount, value, {from:this.currAccount});
+	console.log((await this.lendingContractInst.getAssetIds()))
     }
 
     render() {
