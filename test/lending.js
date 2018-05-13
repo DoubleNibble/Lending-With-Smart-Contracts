@@ -128,4 +128,47 @@ contract('Lending', function(accounts, app) {
     })
   });
 
+  it("The owner of an asset should be able to pay back funds", function() {
+    var app;
+    var owner = accounts[3];
+    var lendingID = 1000;
+    var borrowAmount = web3.toWei(1, "ether");
+
+    return Lending.deployed().then(function(instance) {
+      app = instance;
+      app.payFundsBack(lendingID, {from: owner, value: borrowAmount});
+      return app.allLendingContracts(lendingID);
+    }).then(function(lending) {
+      assert.equal(lending[10], true, "deleted set to false");
+    })
+  });
+
+  it("A late payment should trigger a change in ownership", function(){
+    var app;
+    var owner = accounts[3];
+    var lender = accounts[5];
+    var assetID = 1000;
+    var lendingID = 1000;
+    var borrowAmount = web3.toWei(1, "ether");
+    var premium = web3.toWei(0.1, "ether");
+    var lendingPeriod = 0;
+
+    return Lending.deployed().then(function(instance) {
+      app = instance;
+      app.borrowFunds(assetID, borrowAmount, premium, lendingPeriod, {from: owner, value: premium});
+      return app.getLendingContractCount();
+    }).then(function(lending) {
+      assert.equal(lending.valueOf(), 1, "The number of lending contracts has not been incremented");
+    }).then(function(){
+      return app.getLendingIds();
+    }).then(function(contractID) {
+      assert.equal(contractID[0], lendingID, "The lending ID is not correct");
+      app.lendFunds(lendingID, {from: lender, value: borrowAmount});
+      app.reportLatePayment(lendingID,{from: lender, value: 0});
+      return app.allAssets(assetID);
+    }).then(function(contract) {
+      assert.equal(contract[1], lender, "The asset was not transferred to the right account");
+    })
+  });
+
 });

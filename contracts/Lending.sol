@@ -55,6 +55,7 @@ contract Lending {
 
   event AssetChange(uint assetID);
   event LendingContractChange(uint lendingID);
+  event Address(address fun);
 
   /***********************************/
   /********* PUBLIC FUNCTIONS ********/
@@ -108,14 +109,17 @@ contract Lending {
     allLendingContracts[_lendingID].acceptor.transfer(msg.value);
     allLendingContracts[_lendingID].deleted = true;
     allAssets[allLendingContracts[_lendingID].collateralAssetID].borrowedAgainst = false;
+    lendingContractCount--;
   }
 
   function reportLatePayment(uint _lendingID) public payable {
     require(allLendingContracts[_lendingID].acceptor == msg.sender);
     require(allLendingContracts[_lendingID].filled);
+    require(!allLendingContracts[_lendingID].deleted);
     require(now > allLendingContracts[_lendingID].endTime);
 
-    transferOwnership(msg.sender,allLendingContracts[_lendingID].collateralAssetID);
+    Address(msg.sender);
+    allAssets[allLendingContracts[_lendingID].collateralAssetID].owner = msg.sender;
     allAssets[allLendingContracts[_lendingID].collateralAssetID].borrowedAgainst = false;
     allLendingContracts[_lendingID].deleted = true;
   }
@@ -159,6 +163,9 @@ contract Lending {
     return assetCount;
   }
 
+  function getTime() public constant returns (uint){
+    return now;
+  }
   /***********************************/
   /******** PRIVATE FUNCTIONS ********/
   /***********************************/
