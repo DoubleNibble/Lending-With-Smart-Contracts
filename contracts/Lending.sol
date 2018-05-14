@@ -55,7 +55,6 @@ contract Lending {
 
   event AssetChange(uint assetID);
   event LendingContractChange(uint lendingID);
-  event Address(address fun);
 
   /***********************************/
   /********* PUBLIC FUNCTIONS ********/
@@ -68,8 +67,12 @@ contract Lending {
     assetCount = 0;
   }
 
-  // Done
-  // /*bytes memory _hex_proof,*/
+  /// @dev                    Allows a user with an asset to request a loan
+  /// @param  _assetID        The json file passing the interest rate
+  /// @param  borrowAmount    The odds put forward by the user
+  /// @param  _home_score     The home score proposed by the user
+  /// @param  _away_score     The away score proposed by the user
+  /// @param  _proof          The json file passing the interest rate
   function borrowFunds(uint _assetID, uint borrowAmount, uint _premium, uint _lending_period) public payable {
     require(!allAssets[_assetID].borrowedAgainst);
     require(allAssets[_assetID].value >= borrowAmount);
