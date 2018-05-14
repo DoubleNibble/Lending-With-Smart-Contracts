@@ -14,13 +14,13 @@ contract Lending {
     address proposer;
     address acceptor;
     uint borrowedAmount;
-    uint interestRatePremium;
     uint startTime;
     uint endTime;
     uint lendingTimePeriod;
     uint collateralAssetID;
     bool filled;
     bool deleted;
+    uint totalPremium;
   }
 
   struct AssetOwnership {
@@ -31,9 +31,6 @@ contract Lending {
   }
 
   address public master;
-
-  uint public time1;
-  uint public time2;
 
   uint[] lendingIDs;
   uint lendingContractCount;
@@ -58,6 +55,7 @@ contract Lending {
 
   event AssetChange(uint assetID);
   event LendingContractChange(uint lendingID);
+  event Premium(uint premiumAmount);
 
   /***********************************/
   /********* PUBLIC FUNCTIONS ********/
@@ -73,25 +71,36 @@ contract Lending {
   /// @dev                      Allows a user with an asset to request a loan
   /// @param  _assetID          The json file passing the interest rate
   /// @param  _borrowAmount     The amount wanted to be borrowed by the user
-  /// @param  _premium          The number of basis points above the interest rate willing to be paid
   /// @param  _lending_period   The number of weeks the user wants to borrow the money for
   /// @param  _hex_proof        The number of weeks the user wants to borrow the money for
-  function borrowFunds(uint _assetID, uint _borrowAmount, uint _premium, uint _lending_period, bytes memory _hex_proof) public payable {
+  function borrowFunds(uint _assetID, uint _borrowAmount, uint _lending_period, bytes memory _hex_proof) public payable {
     require(!allAssets[_assetID].borrowedAgainst);
     require(allAssets[_assetID].value >= _borrowAmount);
     require(allAssets[_assetID].owner == msg.sender);
 
-    // Work out the Bank of England Base Interest Rate from Hex Proof
     // Verify the TLS-N Proof
     require(verifyProof(_hex_proof));
 
-    // Check that the funds transferred into the contract are equl to the number of weeks money required and above base rate
-    // The individual will need to transfer enough funds in to cover the entire period, even if withdraw early
+    // Parse the response body of the TLS-N proof
+    string memory body = string(tlsnutils.getHTTPBody(_hex_proof));
+    JsmnSolLib.Token[] memory tokens;
+    uint returnValue;
+    uint actualNum;
+    (returnValue, tokens, actualNum) = JsmnSolLib.parse(body, 100);
+
+    // Get the interest rate
+    string memory interest_string = JsmnSolLib.getBytes(body, tokens[43].start, tokens[43].end);
+    int interest_int = JsmnSolLib.parseInt(interest_string);
+
+    // Check the user has passed in the right premium to match the interest rate
+    uint yearly_premium = ((msg.value * 100 * 52) / _lending_period)/_borrowAmount;
+    Premium(yearly_premium);
+    require(yearly_premium == uint(interest_int));
 
     // Setup Contract
     uint lendingID = (lendingContractCount++)+1000;
     lendingIDs.push(lendingID);
-    allLendingContracts[lendingID] = LendingContract(lendingID, msg.sender, 0, _borrowAmount, _premium, 0, 0, _lending_period, _assetID, false, false);
+    allLendingContracts[lendingID] = LendingContract(lendingID, msg.sender, 0, _borrowAmount, 0, 0, _lending_period, _assetID, false, false, msg.value);
     LendingContractChange(lendingID);
   }
 
@@ -101,6 +110,7 @@ contract Lending {
     require(msg.value == allLendingContracts[_lendingID].borrowedAmount);
     require(!allLendingContracts[_lendingID].filled);
     allLendingContracts[_lendingID].proposer.transfer(msg.value);
+    msg.sender.transfer(allLendingContracts[_lendingID].totalPremium);
     allLendingContracts[_lendingID].filled = true;
     allLendingContracts[_lendingID].acceptor = msg.sender;
     allLendingContracts[_lendingID].startTime = now;
@@ -115,9 +125,6 @@ contract Lending {
     require(allLendingContracts[_lendingID].filled);
     require(now < allLendingContracts[_lendingID].endTime);
 
-    // Also need to pay back some of the premium that the individual paid in
-    // Proportional to how many days early they repaid
-
     allLendingContracts[_lendingID].acceptor.transfer(msg.value);
     allLendingContracts[_lendingID].deleted = true;
     allAssets[allLendingContracts[_lendingID].collateralAssetID].borrowedAgainst = false;
@@ -128,9 +135,6 @@ contract Lending {
   /// @param  _lendingID    The ID of the lending contract that has not been paid
   function reportLatePayment(uint _lendingID) public payable {
     uint time = now;
-    time1 = now;
-    time2 = allLendingContracts[_lendingID].endTime;
-
     require(allLendingContracts[_lendingID].acceptor == msg.sender);
     require(allLendingContracts[_lendingID].filled);
     require(!allLendingContracts[_lendingID].deleted);
@@ -190,15 +194,9 @@ contract Lending {
     return assetCount;
   }
 
-  // Delete this when done
-  function getTime1() public constant returns (uint){
-    return now;
-  }
-
-  // Delete this when done
-  function getTime2(uint _lendingID) public constant returns (uint){
-    return allLendingContracts[_lendingID].endTime;
-  }
+  /***********************************/
+  /******** PRIVATE FUNCTIONS ********/
+  /***********************************/
 
   function verifyProof(bytes memory proof) private returns (bool){
     uint qx = 0xe0a5793d275a533d50421b201c2c9a909abb58b1a9c0f9eb9b7963e5c8bc2295;
