@@ -14,13 +14,13 @@ contract Lending {
     address proposer;
     address acceptor;
     uint borrowedAmount;
-    uint interestRatePremium; // measured in bps on top of Bank of England base rate
     uint startTime;
     uint endTime;
-    uint lendingTimePeriod; // in weeks
+    uint lendingTimePeriod;
     uint collateralAssetID;
     bool filled;
     bool deleted;
+    uint totalPremium;
   }
 
   struct AssetOwnership {
@@ -55,6 +55,7 @@ contract Lending {
 
   event AssetChange(uint assetID);
   event LendingContractChange(uint lendingID);
+  event Premium(uint premiumAmount);
 
   /***********************************/
   /********* PUBLIC FUNCTIONS ********/
@@ -67,60 +68,86 @@ contract Lending {
     assetCount = 0;
   }
 
-  // Done
-  // /*bytes memory _hex_proof,*/
-  function borrowFunds(uint _assetID, uint borrowAmount, uint _premium, uint _lending_period) public payable {
+  /// @dev                      Allows a user with an asset to request a loan
+  /// @param  _assetID          The json file passing the interest rate
+  /// @param  _borrowAmount     The amount wanted to be borrowed by the user
+  /// @param  _lending_period   The number of weeks the user wants to borrow the money for
+  /// @param  _hex_proof        The number of weeks the user wants to borrow the money for
+  function borrowFunds(uint _assetID, uint _borrowAmount, uint _lending_period, bytes memory _hex_proof) public payable {
     require(!allAssets[_assetID].borrowedAgainst);
-    require(allAssets[_assetID].value >= borrowAmount);
+    require(allAssets[_assetID].value >= _borrowAmount);
     require(allAssets[_assetID].owner == msg.sender);
 
-    // Work out the Bank of England Base Interest Rate from Hex Proof
+    // Verify the TLS-N Proof
+    require(verifyProof(_hex_proof));
 
-    // Check that the funds transferred into the contract are equl to the number of weeks money required and above base rate
-    // The individual will need to transfer enough funds in to cover the entire period, even if withdraw early
+    // Parse the response body of the TLS-N proof
+    string memory body = string(tlsnutils.getHTTPBody(_hex_proof));
+    JsmnSolLib.Token[] memory tokens;
+    uint returnValue;
+    uint actualNum;
+    (returnValue, tokens, actualNum) = JsmnSolLib.parse(body, 100);
+
+    // Get the interest rate
+    string memory interest_string = JsmnSolLib.getBytes(body, tokens[43].start, tokens[43].end);
+    int interest_int = JsmnSolLib.parseInt(interest_string);
+
+    // Check the user has passed in the right premium to match the interest rate
+    uint yearly_premium = ((msg.value * 100 * 52) / _lending_period)/_borrowAmount;
+    Premium(yearly_premium);
+    require(yearly_premium == uint(interest_int));
 
     // Setup Contract
     uint lendingID = (lendingContractCount++)+1000;
     lendingIDs.push(lendingID);
-    allLendingContracts[lendingID] = LendingContract(lendingID, msg.sender, 0, borrowAmount, _premium, 0, 0, _lending_period, _assetID, false, false);
+    allLendingContracts[lendingID] = LendingContract(lendingID, msg.sender, 0, _borrowAmount, 0, 0, _lending_period, _assetID, false, false, msg.value);
     LendingContractChange(lendingID);
   }
 
+  /// @dev                  Allows a user to lend funds to another user
+  /// @param  _lendingID    The ID of the lending contract to be fulfilled
   function lendFunds(uint _lendingID) public payable {
     require(msg.value == allLendingContracts[_lendingID].borrowedAmount);
     require(!allLendingContracts[_lendingID].filled);
     allLendingContracts[_lendingID].proposer.transfer(msg.value);
+    msg.sender.transfer(allLendingContracts[_lendingID].totalPremium);
     allLendingContracts[_lendingID].filled = true;
     allLendingContracts[_lendingID].acceptor = msg.sender;
     allLendingContracts[_lendingID].startTime = now;
     allLendingContracts[_lendingID].endTime = now + (allLendingContracts[_lendingID].lendingTimePeriod * 1 weeks);
   }
 
+  /// @dev                  Allows the original user who borrowed funds to pay the money back
+  /// @param  _lendingID    The ID of the lending contract to be paid back
   function payFundsBack(uint _lendingID) public payable {
     require(allLendingContracts[_lendingID].proposer == msg.sender);
     require(allLendingContracts[_lendingID].borrowedAmount == msg.value);
     require(allLendingContracts[_lendingID].filled);
     require(now < allLendingContracts[_lendingID].endTime);
 
-    // Also need to pay back some of the premium that the individual paid in
-    // Proportional to how many days early they repaid
-
     allLendingContracts[_lendingID].acceptor.transfer(msg.value);
     allLendingContracts[_lendingID].deleted = true;
     allAssets[allLendingContracts[_lendingID].collateralAssetID].borrowedAgainst = false;
+    lendingContractCount--;
   }
 
+  /// @dev                  Allows a lender to report a late payment
+  /// @param  _lendingID    The ID of the lending contract that has not been paid
   function reportLatePayment(uint _lendingID) public payable {
+    uint time = now;
     require(allLendingContracts[_lendingID].acceptor == msg.sender);
     require(allLendingContracts[_lendingID].filled);
-    require(now > allLendingContracts[_lendingID].endTime);
+    require(!allLendingContracts[_lendingID].deleted);
+    require(time > allLendingContracts[_lendingID].endTime);
 
-    transferOwnership(msg.sender,allLendingContracts[_lendingID].collateralAssetID);
+    allAssets[allLendingContracts[_lendingID].collateralAssetID].owner = msg.sender;
     allAssets[allLendingContracts[_lendingID].collateralAssetID].borrowedAgainst = false;
     allLendingContracts[_lendingID].deleted = true;
   }
 
-  // Done
+  /// @dev                  Allows the owner of the contract to add assets
+  /// @param  _owner        The address of the owner of the asset
+  /// @param  _value        The value of the asset being added
   function addAsset(address _owner, uint _value) public isOwner {
     uint assetID = (assetCount++)+1000;
     assetIDs.push(assetID);
@@ -128,33 +155,41 @@ contract Lending {
     AssetChange(assetID);
   }
 
-  // Done
+  /// @dev                  Allows the owner of the contract or the owner of the asset to transfer ownership
+  /// @param  _recipient    The address of the recipient of the asset
+  /// @param  _assetID      The ID of the asset to be transferred
   function transferOwnership(address _recipient, uint _assetID) public {
     require(allAssets[_assetID].owner == msg.sender || msg.sender == master);
     allAssets[_assetID].owner = _recipient;
   }
 
-  // Done
+  /// @dev                  Allows the owner of the contract to change the value of an asset
+  /// @param  _assetID      The ID of the asset to be re-valued
+  /// @param  _new_value    The new value of the asset
   function changeValue(uint _assetID, uint _new_value) public isOwner {
     allAssets[_assetID].value = _new_value;
   }
 
-  // Done
+  /// @dev       Allows requestor to return all lending IDs
+  /// @return    Returns the lending IDs of every outstanding lending contract
   function getLendingIds() public constant returns (uint[]) {
     return lendingIDs;
   }
 
-  // Done
+  /// @dev       Allows requestor to return all asset IDs
+  /// @return    Returns the asset IDs of every asset in the contract
   function getAssetIds() public constant returns (uint[]) {
     return assetIDs;
   }
 
-  // Done
+  /// @dev       Allows requestor to return the number of outstanding lending contracts
+  /// @return    Returns the number of lending contracts outstanding
   function getLendingContractCount() public constant returns (uint) {
     return lendingContractCount;
   }
 
-  // Done
+  /// @dev       Allows requestor to return the number of assets
+  /// @return    Returns the number of assets in the contract
   function getAssetCount() public constant returns (uint) {
     return assetCount;
   }
@@ -162,5 +197,14 @@ contract Lending {
   /***********************************/
   /******** PRIVATE FUNCTIONS ********/
   /***********************************/
+
+  function verifyProof(bytes memory proof) private returns (bool){
+    uint qx = 0xe0a5793d275a533d50421b201c2c9a909abb58b1a9c0f9eb9b7963e5c8bc2295;
+    uint qy = 0xf34d47cb92b6474562675127677d4e446418498884c101aeb38f3afb0cab997e;
+    if(tlsnutils.verifyProof(proof, qx, qy)){
+      return true;
+    }
+    return false;
+  }
 
 }
