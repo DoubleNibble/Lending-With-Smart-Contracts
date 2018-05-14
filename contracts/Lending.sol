@@ -118,7 +118,6 @@ contract Lending {
     require(!allLendingContracts[_lendingID].deleted);
     require(now > allLendingContracts[_lendingID].endTime);
 
-    Address(msg.sender);
     allAssets[allLendingContracts[_lendingID].collateralAssetID].owner = msg.sender;
     allAssets[allLendingContracts[_lendingID].collateralAssetID].borrowedAgainst = false;
     allLendingContracts[_lendingID].deleted = true;
