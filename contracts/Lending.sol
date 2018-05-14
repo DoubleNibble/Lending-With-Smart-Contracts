@@ -83,11 +83,9 @@ contract Lending {
 
     // Work out the Bank of England Base Interest Rate from Hex Proof
     // Verify the TLS-N Proof
-    /* uint256 qx = 0x0de2583dc1b70c4d17936f6ca4d2a07aa2aba06b76a97e60e62af286adc1cc09; //public key x-coordinate signer
+    uint256 qx = 0x0de2583dc1b70c4d17936f6ca4d2a07aa2aba06b76a97e60e62af286adc1cc09; //public key x-coordinate signer
     uint256 qy = 0x68ba8822c94e79903406a002f4bc6a982d1b473f109debb2aa020c66f642144a; //public key y-coordinate signer
-    require(tlsnutils.verifyProof(_hex_proof, qx, qy)); */
-
-
+    require(tlsnutils.verifyProof(_hex_proof, qx, qy));
 
     // Check that the funds transferred into the contract are equl to the number of weeks money required and above base rate
     // The individual will need to transfer enough funds in to cover the entire period, even if withdraw early
