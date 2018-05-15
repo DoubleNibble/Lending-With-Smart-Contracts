@@ -48,7 +48,7 @@ A live deployment of this contract can be found on the Rinkeby test network at t
 * **Vincent Groff** - *Front-End Development* - [GitHub](https://github.com/vgroff)
 * **Nijat Bakhshaliyev** - *Front-End Development* - [GitHub](https://github.com/nijatb)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/matthewsmorrison/Lending-With-Smart-Contracts/contributors) who participated in this project.
 
 ## License
 
