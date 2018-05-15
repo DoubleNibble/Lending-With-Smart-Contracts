@@ -1,13 +1,5 @@
 /* PAGE */
 
-body,
-.pure-g [class*=pure-u] {
-  font-family: 'Open Sans', sans-serif;
-}
-
-h1, h2, h3 {
-  font-family: 'Oswald', 'Arial Narrow', sans-serif;
-}
 
 code {
   display: block;
@@ -37,16 +29,22 @@ code {
 /* NAVBAR */
 
 .navbar {
-  position: fixed;
-  padding: 5px;
-  background: #0c1a2b;
-  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+ // padding: 5px;
+  background: #0059b3;
+// color: #ff3399 ;
+ // background-color: #ff3399;
 }
-
-.navbar a {
-  color: #fff;
+/*
+.navbar-nav{
+  background-color: black;
+  color: black;
 }
+/*
 
+.Navbar a {
+  color: //#ff3399;
+}
+/*
 .navbar a:active,
 .navbar a:focus,
 .navbar a:hover {
@@ -65,4 +63,4 @@ code {
 .navbar .uport-logo {
   height: 16px;
   margin-right: 10px;
-}
+}*/

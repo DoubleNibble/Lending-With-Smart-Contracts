@@ -3,9 +3,9 @@ import Lending from '../build/contracts/Lending.json'
 import getWeb3 from './utils/getWeb3'
 import * as interestRates from './interestRates.js'
 
-import './css/oswald.css'
-import './css/open-sans.css'
-import './css/pure-min.css'
+import {Jumbotron, Button, Navbar, Nav, NavItem, MenuItem, NavDropdown, Well}  from 'react-bootstrap'
+import {Switch, Route, Link} from 'react-router-dom'
+
 import './App.css'
 
 // Loan class for client-side representation
@@ -228,7 +228,7 @@ class App extends Component {
 		}
 	    }
 	}
-	this.setState({unfundedLoans: unfundedLoans, fundedLoans: fundedLoans, loansMade: loansMade, proposedLoans: proposedLoans}) 
+	this.setState({unfundedLoans: unfundedLoans, fundedLoans: fundedLoans, loansMade: loansMade, proposedLoans: proposedLoans})
     }
 
     // Convert loan array to loan object
@@ -256,7 +256,7 @@ class App extends Component {
 	console.log(proof)
 	this.lendingContractInst.borrowFunds(1000, this.state.web3.toWei(amount, "ether"),
 					     lendingPeriod, proof,
-					     {from:this.currAccount, value:this.state.web3.toWei(premium, "ether")}) 
+					     {from:this.currAccount, value:this.state.web3.toWei(premium, "ether")})
     }
 
     async addNewAsset(value) {
@@ -288,22 +288,90 @@ class App extends Component {
     render() {
 	return (
 		<div className="App">
-		<nav className="navbar pure-menu pure-menu-horizontal">
-		<a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
-		</nav>
+		<div class="container">
+
+
+
+		<Navbar fluid bsStyle="inverse" scrolling>
+			  <Navbar.Header>
+			    <Navbar.Brand>
+			      <a href="/"> InsuranceDApp</a>
+			    </Navbar.Brand>
+			  </Navbar.Header>
+			  <Nav>
+			    <NavItem  eventKey={1} href="/about">
+			      Documentation
+			    </NavItem>
+			  </Nav>
+			  <Nav>
+			    <NavItem  eventKey={2} href="/create_loans">
+			      Create Loans
+			    </NavItem>
+			  </Nav>
+			  <Nav>
+			    <NavItem  eventKey={3} href="/my_loans">
+			      My Loans
+			    </NavItem>
+			  </Nav>
+			</Navbar>
+
+
+		<div>
+			<Switch>
+				<Route exact path ="/" render = {()=>
+					<div>
+						<Jumbotron>
+							<h1>Insurance DApp</h1>
+		       			    <p><strong>Your personal flight loan generator.</strong></p>
+		        			<Button bsStyle="info" bsSize="large" href="/about" >Learn more </Button>
+						</Jumbotron>
+						<Well>
+							<p> We decided against having a centralised party providing a pre-determined range of policies that will be available to users. </p>
+							<p>	We felt that this undermined the decentralised nature of using TLS-N and the blockchain. </p>
+							<p>	We decided to allow users to suggest premiums they were willing to pay and other users could decide to fund those contracts. </p>
+							<p>	This is a much more free market, decentralised approach to the problem.</p>
+						</Well>
+					</div>
+				}/>
+
+				<Route path="/create_loans" render ={()=>
+					<div>
+						<LoanCreator addNewLoan={this.addNewLoan.bind(this)} baseRate={this.state.boeInterestRate}/>
+						<button onClick={() => {this.addNewAsset(1)}}>Add New Asset </button>
+						<LoanList loans={[new Loan(1,0,0,2,1,1,1001,1,3,2, false, false)]} header={"List 1"}/>
+					</div>
+				}/>
+
+				<Route path="/about" render = { ()=>
+				   <div>
+				   <Well>
+				    <h2>More Information on LendingDApp</h2>
+				    <p> <strong> add more info about this app </strong></p>
+				    <p>Smart contracts written on the blockchain cannot fetch real world data and must rely on trusted, third-party oracles to request it from the desired source. Currently, these oracles must be trusted to feed the data unedited to the blockchain for use by the requesting contract.</p>
+				    <p>Having the ability to independently verify information would remove the need for trust in third parties while guaranteeing the validity of the data received over the internet. As a result, it would be possible to automatically feed this information into the blockchain ecosystem and execute contracts on the basis of it. TLS-N, an extension to the existing secure web protocol TLS, achieves this goal.</p>
+					<p>It provides a secure, non-repudiable and trivially verifiable proof about the contents (message, time-stamped) of a TLS session, and that the contents have not been tampered with. As a result, users no longer need to trust that oracles or intermediaries have not tampered with data, and can automate the execution of their contracts based on the TLS-N verification.</p>
+				   </Well>
+				  </div>
+
+				}/>
+
+				<Route path="/my_loans" render ={()=>
+				<div>
+					<LoanList loans={this.state.unfundedLoans} header={"Your Unfunded Loans"} buttonAction={this.cancelLoan.bind(this)} buttonText={"Cancel Loan"}/>
+					<LoanList loans={this.state.fundedLoans} header={"Your Funded Loans"} buttonAction={this.repayLoan.bind(this)} buttonText={"Repay Loan"}/>
+					<LoanList loans={this.state.loansMade} header={"Loans You've Made"} buttonAction={this.claimAsset.bind(this)} buttonText={"Claim Asset"}/>
+					<LoanList loans={this.state.proposedLoans} header={"Proposed Loans"} buttonAction={this.acceptLoan.bind(this)} buttonText={"Make Loan"}/>
+				</div>
+				}/>
+    		</Switch>
+		</div>
 
 		<main className="container">
-		<div className="pure-g">
-		<div className="pure-u-1-1">
-		<LoanCreator addNewLoan={this.addNewLoan.bind(this)} baseRate={this.state.boeInterestRate}/>
-		<button onClick={() => {this.addNewAsset(1)}}>Add New Asset </button>
-		<LoanList loans={this.state.unfundedLoans} header={"Your Unfunded Loans"} buttonAction={this.cancelLoan.bind(this)} buttonText={"Cancel Loan"}/>
-		<LoanList loans={this.state.fundedLoans} header={"Your Funded Loans"} buttonAction={this.repayLoan.bind(this)} buttonText={"Repay Loan"}/>
-		<LoanList loans={this.state.loansMade} header={"Loans You've Made"} buttonAction={this.claimAsset.bind(this)} buttonText={"Claim Asset"}/>
-		<LoanList loans={this.state.proposedLoans} header={"Proposed Loans"} buttonAction={this.acceptLoan.bind(this)} buttonText={"Make Loan"}/>
-	    </div>
-		</div>
+
+
 		</main>
+
+		</div>
 		</div>
 	);
     }
@@ -311,9 +379,21 @@ class App extends Component {
 
 export default App
 
+/*
+<main className="container">
+<div className="pure-g">
+<div className="pure-u-1-1">
+<LoanCreator addNewLoan={this.addNewLoan.bind(this)} baseRate={this.state.boeInterestRate}/>
+<button onClick={() => {this.addNewAsset(1)}}>Add New Asset </button>
+<LoanList loans={this.state.unfundedLoans} header={"Your Unfunded Loans"} buttonAction={this.cancelLoan.bind(this)} buttonText={"Cancel Loan"}/>
+<LoanList loans={this.state.fundedLoans} header={"Your Funded Loans"} buttonAction={this.repayLoan.bind(this)} buttonText={"Repay Loan"}/>
+<LoanList loans={this.state.loansMade} header={"Loans You've Made"} buttonAction={this.claimAsset.bind(this)} buttonText={"Claim Asset"}/>
+<LoanList loans={this.state.proposedLoans} header={"Proposed Loans"} buttonAction={this.acceptLoan.bind(this)} buttonText={"Make Loan"}/>
+  </div>
+*/
 
 /* Plan:
  * - Try the actions out on the  blockchain
  * - Show the BOE interest rate somewhere
- * - New loan creator 
+ * - New loan creator
 */
