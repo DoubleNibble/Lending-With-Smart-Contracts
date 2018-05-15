@@ -1,0 +1,28 @@
+Front end (Vincent and Nijhat)
+
+\item need to work out how to parse json fixture from tls-n
+\item do not show claimed bets in outstanding bets
+\item Dapp 2 front end + styling
+\item Dapp 3 front end + styling
+\item get proof working dapps 2 and 3
+\item better tab names
+\item document and comment
+\end{itemize}
+\item Contracts (Mo and Matt)
+\begin{itemize}
+\item testing/fixing both Dapps
+\item Ropsten?
+\item fix floating point issues
+\item getting various errors when trying to add assets to lending contract
+\item lending contract assets: the addAsset function needs to be only called by the central party that is valuating the assets. Currently start and end period are set to 0
+\end{itemize}
+\item Hosting (Bastien)
+\begin{itemize}
+\item Host at least 1 front-end, preferably all 3 (not sure how these node servers work)
+\end{itemize}
+\item Report writing (All)
+	\begin{itemize}
+	\item Design choices for three DApps, justify main design choices and discuss other options that have been considered. Split over front end and contract.
+    \item division of work, brief statement of who did what
+    \item final product, description of final product, what included and left out, what were the difficulties. How good is the product, has it satisfied all requirements
+	\end{itemize}

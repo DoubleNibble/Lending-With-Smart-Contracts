@@ -55,7 +55,6 @@ contract Lending {
 
   event AssetChange(uint assetID);
   event LendingContractChange(uint lendingID);
-  event Premium(uint premiumAmount);
 
   /***********************************/
   /********* PUBLIC FUNCTIONS ********/
@@ -75,11 +74,12 @@ contract Lending {
   /// @param  _hex_proof        The number of weeks the user wants to borrow the money for
   function borrowFunds(uint _assetID, uint _borrowAmount, uint _lending_period, bytes memory _hex_proof) public payable {
     require(!allAssets[_assetID].borrowedAgainst);
-    //require(allAssets[_assetID].value >= _borrowAmount);
+    require(allAssets[_assetID].value >= _borrowAmount);
     require(allAssets[_assetID].owner == msg.sender);
+    require(_lending_period >= 1);
 
     // Verify the TLS-N Proof
-    //require(verifyProof(_hex_proof));
+    require(verifyProof(_hex_proof));
 
     // Parse the response body of the TLS-N proof
     string memory body = string(tlsnutils.getHTTPBody(_hex_proof));
@@ -90,12 +90,11 @@ contract Lending {
 
     // Get the interest rate
     string memory interest_string = JsmnSolLib.getBytes(body, tokens[43].start, tokens[43].end);
-    int interest_int = JsmnSolLib.parseInt(interest_string);
+    int interest_int = JsmnSolLib.parseInt(interest_string,4);
 
     // Check the user has passed in the right premium to match the interest rate
-    uint yearly_premium = ((msg.value * 100 * 52) / _lending_period)/_borrowAmount;
-    Premium(yearly_premium);
-    //require(yearly_premium == uint(interest_int));
+    uint yearly_premium = ((msg.value * 100000 * 52) / _lending_period)/_borrowAmount;
+    require(yearly_premium > uint(interest_int));
 
     // Setup Contract
     uint lendingID = (lendingContractCount++)+1000;
@@ -117,6 +116,18 @@ contract Lending {
     allLendingContracts[_lendingID].endTime = now + (allLendingContracts[_lendingID].lendingTimePeriod * 1 weeks);
   }
 
+  /// @dev                  Allows a user to cancel a loan if it has not been funded
+  /// @param  _lendingID    The ID of the lending contract to be cancelled
+  function cancelLoan(uint _lendingID) public payable {
+    require(msg.sender == allLendingContracts[_lendingID].proposer);
+    require(!allLendingContracts[_lendingID].filled);
+    require(!allLendingContracts[_lendingID].deleted);
+
+    allLendingContracts[_lendingID].deleted = true;
+    LendingContractChange(_lendingID);
+    msg.sender.transfer(allLendingContracts[_lendingID].totalPremium);
+  }
+
   /// @dev                  Allows the original user who borrowed funds to pay the money back
   /// @param  _lendingID    The ID of the lending contract to be paid back
   function payFundsBack(uint _lendingID) public payable {
@@ -129,6 +140,7 @@ contract Lending {
     allLendingContracts[_lendingID].deleted = true;
     allAssets[allLendingContracts[_lendingID].collateralAssetID].borrowedAgainst = false;
     lendingContractCount--;
+    LendingContractChange(_lendingID);
   }
 
   /// @dev                  Allows a lender to report a late payment
@@ -143,6 +155,7 @@ contract Lending {
     allAssets[allLendingContracts[_lendingID].collateralAssetID].owner = msg.sender;
     allAssets[allLendingContracts[_lendingID].collateralAssetID].borrowedAgainst = false;
     allLendingContracts[_lendingID].deleted = true;
+    LendingContractChange(_lendingID);
   }
 
   /// @dev                  Allows the owner of the contract to add assets
@@ -198,6 +211,8 @@ contract Lending {
   /******** PRIVATE FUNCTIONS ********/
   /***********************************/
 
+  /// @dev       Allows requestor to return whether a proof verifies or not
+  /// @return    Returns a boolean value if the proof passes or not
   function verifyProof(bytes memory proof) private returns (bool){
     uint qx = 0xe0a5793d275a533d50421b201c2c9a909abb58b1a9c0f9eb9b7963e5c8bc2295;
     uint qy = 0xf34d47cb92b6474562675127677d4e446418498884c101aeb38f3afb0cab997e;

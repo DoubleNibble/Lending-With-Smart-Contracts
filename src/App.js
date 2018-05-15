@@ -10,14 +10,14 @@ import './App.css'
 
 // Loan class for client-side representation
 class Loan {
-    constructor(id, proposer, accepter, timePeriod, amount, interestRatePremium, assetID,
-		startTime, endTime, filled, deleted) {
+    constructor(id, proposer, accepter, timePeriod, amount, assetID,
+		startTime, endTime, filled, deleted, totalPremium) {
 	this.id = id
 	this.proposer = proposer
 	this.accepter = accepter
 	this.timePeriod = timePeriod
 	this.amount = amount
-	this.interestRatePremium = interestRatePremium
+	this.totalPremium = totalPremium
 	this.assetID = assetID
 	this.startTime = startTime
 	this.endTime = endTime
@@ -41,7 +41,7 @@ class LoanView extends Component {
 	       <p style={pStyle(this.props.idWidth)}>{this.props.loan.id}</p>
 	       <p style={pStyle(this.props.assetIdWidth)}>{this.props.loan.assetID}</p>
 	       <p style={pStyle(this.props.amountWidth)}>{this.props.loan.amount}</p>
-	       <p style={pStyle(this.props.interestPremWidth)}>{this.props.loan.interestRatePremium}</p>
+	       <p style={pStyle(this.props.interestPremWidth)}>{this.props.loan.totalPremium}</p>
 	       </div>)
     }
 }
@@ -116,7 +116,7 @@ class LoanCreator extends Component {
 		<input placeholder={"Asset ID"} onChange={(e) => this.setAssetID(e.target.value)}></input>
 		<input placeholder={"Time period (weeks)"} onChange={(e) => this.setLendingPeriod(e.target.value)}></input>
 		<p>Requesting a loan for {this.state.amount} with interest rate {this.state.interestRate} to be paid back in {this.state.lendingPeriod} weeks with asset number {this.state.assetID} as collateral</p>
-		<button onClick={() => {this.props.addNewLoan(this.state.amount, this.state.interestRatePremium, this.state.lendingPeriod, this.state.assetId)}}>Request Loan</button>
+		<button onClick={() => {this.props.addNewLoan(this.state.amount, this.state.interestRatePremium, this.state.lendingPeriod, this.state.assetID)}}>Request Loan</button>
 	    </div> )
     }
 }
@@ -189,6 +189,7 @@ class App extends Component {
 	this.lendingContract = contract(Lending)
 	this.lendingContract.setProvider(this.state.web3.currentProvider)
 	this.lendingContractInst = await this.lendingContract.deployed()
+	console.log(this.lendingContractInst)
     }
 
     // Gets the loans from the blockchain and sorts them into various lists
@@ -199,13 +200,15 @@ class App extends Component {
 		     new Loan(3,this.currAccount,0,2,1,1,1001,3,2, true, false),
 		     new Loan(4,0,this.currAccount,2,1,1,1001,3,2, true, false),
 		     new Loan(5,this.currAccount,0,2,1,1,1001,3,2, false, true)]*/
-	var loans = []
+	console.log((await this.lendingContractInst.getLendingIds()))
+	var loans = await this.lendingContractInst.getLendingIds()
 	var unfundedLoans = []
 	var fundedLoans = []
 	var loansMade = []
 	var proposedLoans = []
 	for (var i = 0; i < loans.length; i++) {
-	    var loan = loans[i]
+	    var loan = await this.lendingContractInst.allLendingContracts(loans[i])
+	    loan = this.convertLoans(loan)
 	    if (loan.deleted == false) {
 		// If loan hasnt been deleted
 		if (loan.proposer == this.currAccount) {
@@ -234,19 +237,20 @@ class App extends Component {
 
     // Convert loan array to loan object
     convertLoans(loanArr) {
-	var id = loanArr[0]//.toNumber()
+	console.log(loanArr)
+	var id = loanArr[0].toNumber()
 	var proposer = loanArr[1]
 	var accepter = loanArr[2]
-	var amount = loanArr[3].toNumber()
-	var interestRatePremium = loanArr[4].toNumber()
-	var startTime = loanArr[5].toNumber()
-	var endTime = loanArr[6].toNumber()
-	var timePeriod = loanArr[7].toNumber()
-	var assetID = loanArr[8].toNumber()
-	var filled = loanArr[9]
-	var deleted = loanArr[10]
-	var loan = Loan(id, proposer, accepter, timePeriod, amount, interestRatePremium, assetID,
-			startTime, endTime, filled, deleted);
+	var amount = this.state.web3.fromWei(loanArr[3].toNumber(), "ether")
+	var startTime = loanArr[4].toNumber()
+	var endTime = loanArr[5].toNumber()
+	var timePeriod = loanArr[6].toNumber()
+	var assetID = loanArr[7].toNumber()
+	var filled = loanArr[8]
+	var deleted = loanArr[9]
+	var totalPremium = loanArr[10].toNumber()
+	var loan = new Loan(id, proposer, accepter, timePeriod, amount,
+			    assetID, startTime, endTime, filled, deleted, totalPremium);
 	return loan
     }
 
@@ -257,7 +261,8 @@ class App extends Component {
 	console.log(proof)
 	proof = proof.proof
 	this.setState({proof:proof})
-	this.lendingContractInst.borrowFunds(1000, this.state.web3.toWei(amount, "ether"),
+	console.log(assetId)
+	this.lendingContractInst.borrowFunds(assetId, this.state.web3.toWei(amount, "ether"),
 					     lendingPeriod, proof,
 					     {from:this.currAccount, value:this.state.web3.toWei(premium, "ether")})
     }
@@ -271,7 +276,7 @@ class App extends Component {
     // Cancels a proposed loan
     async cancelLoan(loan) {
 	console.log("cancelling loan " + loan.id)
-	
+	await this.lendingContractInst.cancelLoan( loan.id, {from:this.currAccount});	
     }
 
     // Agree to makes a loan
@@ -344,7 +349,7 @@ class App extends Component {
 				<Route path="/create_loans" render ={()=>
 					<div>
 						<LoanCreator addNewLoan={this.addNewLoan.bind(this)} baseRate={this.state.boeInterestRate}/>
-						<button onClick={() => {this.addNewAsset(1)}}>Add New Asset </button>
+								     <button onClick={() => {this.addNewAsset(this.state.web3.toWei(1, "ether"))}}>Add New Asset </button>
 
 					</div>
 				}/>
