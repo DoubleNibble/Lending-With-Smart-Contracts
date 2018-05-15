@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Lending from '../build/contracts/Lending.json'
 import getWeb3 from './utils/getWeb3'
+import * as interestRates from './interestRates.js'
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -232,7 +233,7 @@ class App extends Component {
 
     // Convert loan array to loan object
     convertLoans(loanArr) {
-	var id = loanArr[0].toNumber()
+	var id = loanArr[0]//.toNumber()
 	var proposer = loanArr[1]
 	var accepter = loanArr[2]
 	var amount = loanArr[3].toNumber()
@@ -251,7 +252,11 @@ class App extends Component {
     // Adds a new loan to the blockchain
     async addNewLoan(amount, premium, lendingPeriod, assetId) {
 	console.log((await this.lendingContractInst.getAssetIds()))
-	this.lendingContractInst.borrowFunds(1000, 1, 1, 1, {from:this.currAccount}) 
+	var proof = interestRates.fetchInterestRate().proof
+	console.log(proof)
+	this.lendingContractInst.borrowFunds(1000, this.state.web3.toWei(amount, "ether"),
+					     lendingPeriod, proof,
+					     {from:this.currAccount, value:this.state.web3.toWei(premium, "ether")}) 
     }
 
     async addNewAsset(value) {
@@ -292,7 +297,6 @@ class App extends Component {
 		<div className="pure-u-1-1">
 		<LoanCreator addNewLoan={this.addNewLoan.bind(this)} baseRate={this.state.boeInterestRate}/>
 		<button onClick={() => {this.addNewAsset(1)}}>Add New Asset </button>
-		<LoanList loans={[new Loan(1,0,0,2,1,1,1001,1,3,2, false, false)]} header={"List 1"}/>
 		<LoanList loans={this.state.unfundedLoans} header={"Your Unfunded Loans"} buttonAction={this.cancelLoan.bind(this)} buttonText={"Cancel Loan"}/>
 		<LoanList loans={this.state.fundedLoans} header={"Your Funded Loans"} buttonAction={this.repayLoan.bind(this)} buttonText={"Repay Loan"}/>
 		<LoanList loans={this.state.loansMade} header={"Loans You've Made"} buttonAction={this.claimAsset.bind(this)} buttonText={"Claim Asset"}/>
@@ -309,7 +313,7 @@ export default App
 
 
 /* Plan:
- * - Need to be able to cancel propsoed loans, accept those of others, repay those that are funded and claim those that arent repayed (and claim interest?)
+ * - Try the actions out on the  blockchain
  * - Show the BOE interest rate somewhere
  * - New loan creator 
 */
