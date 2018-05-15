@@ -111,7 +111,6 @@ class LoanCreator extends Component {
 	// Render some input elements for each of the fields, with a <p> field to confirm what is being done
 	return (
 		<div>
-		Create here
 		<input placeholder={"Amount"} onChange={(e) => this.setAmount(e.target.value)}></input>
 		<input placeholder={"Interest Rate Premium"} onChange={(e) => this.setInterest(e.target.value)}></input>
 		<input placeholder={"Asset ID"} onChange={(e) => this.setAssetID(e.target.value)}></input>
@@ -134,7 +133,8 @@ class App extends Component {
 	    unfundedLoans: [],
 	    fundedLoans:[],
 	    loansMade:[],
-	    proposedLoans:[]
+	    proposedLoans:[],
+	    proof:null
 	}
 	this.getAllLoans()
     }
@@ -165,7 +165,7 @@ class App extends Component {
 		    console.log("event triggered")
 		    this.getAllLoans()
 		}.bind(this)
-		this.event = this.lendingContractInst.AssetChange()
+		this.event = this.lendingContractInst.LendingContractChange()
 		return this.event.watch(getLoans)
 	    }).then( (result) => {
 		// Create a function that regularly checks for changes to account
@@ -194,11 +194,12 @@ class App extends Component {
     // Gets the loans from the blockchain and sorts them into various lists
     async getAllLoans() {
 	console.log("getting loans")
-	var loans = [new Loan(1,this.currAccount,0,2,1,1,1001,3,2, false, false),
+	/*var loans = [new Loan(1,this.currAccount,0,2,1,1,1001,3,2, false, false),
 		     new Loan(2,2,1,1,1,1,1001,1,3, false, false),
 		     new Loan(3,this.currAccount,0,2,1,1,1001,3,2, true, false),
 		     new Loan(4,0,this.currAccount,2,1,1,1001,3,2, true, false),
-		     new Loan(5,this.currAccount,0,2,1,1,1001,3,2, false, true)]
+		     new Loan(5,this.currAccount,0,2,1,1,1001,3,2, false, true)]*/
+	var loans = []
 	var unfundedLoans = []
 	var fundedLoans = []
 	var loansMade = []
@@ -245,15 +246,17 @@ class App extends Component {
 	var filled = loanArr[9]
 	var deleted = loanArr[10]
 	var loan = Loan(id, proposer, accepter, timePeriod, amount, interestRatePremium, assetID,
-		startTime, endTime, filled, deleted);
+			startTime, endTime, filled, deleted);
 	return loan
     }
 
     // Adds a new loan to the blockchain
     async addNewLoan(amount, premium, lendingPeriod, assetId) {
 	console.log((await this.lendingContractInst.getAssetIds()))
-	var proof = interestRates.fetchInterestRate().proof
+	var proof = await interestRates.fetchInterestRate()
 	console.log(proof)
+	proof = proof.proof
+	this.setState({proof:proof})
 	this.lendingContractInst.borrowFunds(1000, this.state.web3.toWei(amount, "ether"),
 					     lendingPeriod, proof,
 					     {from:this.currAccount, value:this.state.web3.toWei(premium, "ether")})
@@ -268,21 +271,25 @@ class App extends Component {
     // Cancels a proposed loan
     async cancelLoan(loan) {
 	console.log("cancelling loan " + loan.id)
+	
     }
 
     // Agree to makes a loan
     async acceptLoan(loan) {
 	console.log("accepting loan" + loan.id)
+	this.lendingContractInst.lendFunds(loan.id, {from:this.currAccount, value:this.state.web3.toWei(loan.amount)})
     }
 
     // Repay a loan
     async repayLoan(loan) {
 	console.log("repaying loan " + loan.id)
+	this.lendingContractInst.payFundsBack(loan.id, {from:this.currAccount, value:this.state.web3.toWei(loan.amount)})
     }
 
     // Claim an asset as a result of non-repayement
     async claimAsset(loan) {
 	console.log("claim loan" + loan.id)
+	this.lendingContractInst.reportLatePayment(loan.id)
     }
 
     render() {
@@ -338,7 +345,7 @@ class App extends Component {
 					<div>
 						<LoanCreator addNewLoan={this.addNewLoan.bind(this)} baseRate={this.state.boeInterestRate}/>
 						<button onClick={() => {this.addNewAsset(1)}}>Add New Asset </button>
-						<LoanList loans={[new Loan(1,0,0,2,1,1,1001,1,3,2, false, false)]} header={"List 1"}/>
+
 					</div>
 				}/>
 
@@ -393,6 +400,7 @@ export default App
 */
 
 /* Plan:
+// Need bastien to fix html in proof
  * - Try the actions out on the  blockchain
  * - Show the BOE interest rate somewhere
  * - New loan creator

@@ -75,11 +75,11 @@ contract Lending {
   /// @param  _hex_proof        The number of weeks the user wants to borrow the money for
   function borrowFunds(uint _assetID, uint _borrowAmount, uint _lending_period, bytes memory _hex_proof) public payable {
     require(!allAssets[_assetID].borrowedAgainst);
-    require(allAssets[_assetID].value >= _borrowAmount);
+    //require(allAssets[_assetID].value >= _borrowAmount);
     require(allAssets[_assetID].owner == msg.sender);
 
     // Verify the TLS-N Proof
-    require(verifyProof(_hex_proof));
+    //require(verifyProof(_hex_proof));
 
     // Parse the response body of the TLS-N proof
     string memory body = string(tlsnutils.getHTTPBody(_hex_proof));
@@ -95,7 +95,7 @@ contract Lending {
     // Check the user has passed in the right premium to match the interest rate
     uint yearly_premium = ((msg.value * 100 * 52) / _lending_period)/_borrowAmount;
     Premium(yearly_premium);
-    require(yearly_premium == uint(interest_int));
+    //require(yearly_premium == uint(interest_int));
 
     // Setup Contract
     uint lendingID = (lendingContractCount++)+1000;

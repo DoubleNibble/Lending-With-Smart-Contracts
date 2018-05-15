@@ -7,14 +7,14 @@ export async function getProof(url) {
 	method: 'GET',
 	headers: myHeaders,
     };
-
+    console.log(url)
     var myReq = new Request(url, fetchData)
     var response = await fetch(url)
     var buf = await response.arrayBuffer()
     // Converts proof to expected hex format
     var proof = buf2hex(buf)
     proof = "0x"+proof.split("\\x").join("")
-    //console.log(proof)
+    console.log(proof)
     return proof
 }
 
@@ -22,7 +22,7 @@ export async function fetchInterestRate() {
     var myHeaders = new Headers({
     })
 
-    var url = "https://www.quandl.com/api/v3/datasets/BOE/IUMAGR2W?api_key=mzR9A19dDCBBzuBhrNv2"
+    var url = "https://quandl.glitch.me"
 
     var fetchData = {
 	method: 'GET',
@@ -32,8 +32,8 @@ export async function fetchInterestRate() {
     var myRequest = new Request(url, fetchData);
     //myRequest.responseType = 'text'; //;
     var results = await fetch(myRequest);
-    var obj = results.json();
-    console.log(obj)
+    var obj = await results.json();
+    console.log(url, obj)
     var proof = await getProof(url)
     return {proof:proof, data:obj}
 }
@@ -55,3 +55,5 @@ function buf2hex(buffer) {
     // join the parts
     return hexParts.join('');
 }
+
+// Need bastien to fix html in proof
