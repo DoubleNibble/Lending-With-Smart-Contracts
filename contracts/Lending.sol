@@ -55,7 +55,6 @@ contract Lending {
 
   event AssetChange(uint assetID);
   event LendingContractChange(uint lendingID);
-  event Premium(uint premiumAmount);
 
   /***********************************/
   /********* PUBLIC FUNCTIONS ********/
@@ -91,12 +90,11 @@ contract Lending {
 
     // Get the interest rate
     string memory interest_string = JsmnSolLib.getBytes(body, tokens[43].start, tokens[43].end);
-    int interest_int = JsmnSolLib.parseInt(interest_string);
+    int interest_int = JsmnSolLib.parseInt(interest_string,4);
 
     // Check the user has passed in the right premium to match the interest rate
-    uint yearly_premium = ((msg.value * 100 * 52) / _lending_period)/_borrowAmount;
-    Premium(yearly_premium);
-    require(yearly_premium == uint(interest_int));
+    uint yearly_premium = ((msg.value * 100000 * 52) / _lending_period)/_borrowAmount;
+    require(yearly_premium > uint(interest_int));
 
     // Setup Contract
     uint lendingID = (lendingContractCount++)+1000;
@@ -211,6 +209,8 @@ contract Lending {
   /******** PRIVATE FUNCTIONS ********/
   /***********************************/
 
+  /// @dev       Allows requestor to return whether a proof verifies or not
+  /// @return    Returns a boolean value if the proof passes or not
   function verifyProof(bytes memory proof) private returns (bool){
     uint qx = 0xe0a5793d275a533d50421b201c2c9a909abb58b1a9c0f9eb9b7963e5c8bc2295;
     uint qy = 0xf34d47cb92b6474562675127677d4e446418498884c101aeb38f3afb0cab997e;
