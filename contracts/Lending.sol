@@ -77,6 +77,7 @@ contract Lending {
     require(!allAssets[_assetID].borrowedAgainst);
     require(allAssets[_assetID].value >= _borrowAmount);
     require(allAssets[_assetID].owner == msg.sender);
+    require(_lending_period >= 1);
 
     // Verify the TLS-N Proof
     require(verifyProof(_hex_proof));
@@ -115,6 +116,18 @@ contract Lending {
     allLendingContracts[_lendingID].acceptor = msg.sender;
     allLendingContracts[_lendingID].startTime = now;
     allLendingContracts[_lendingID].endTime = now + (allLendingContracts[_lendingID].lendingTimePeriod * 1 weeks);
+  }
+
+  /// @dev                  Allows a user to cancel a loan if it has not been funded
+  /// @param  _lendingID    The ID of the lending contract to be cancelled
+  function cancelLoan(uint _lendingID) public payable {
+    require(msg.sender == allLendingContracts[_lendingID].proposer);
+    require(!allLendingContracts[_lendingID].filled);
+    require(!allLendingContracts[_lendingID].deleted);
+
+    allLendingContracts[_lendingID].deleted = true;
+    LendingContractChange(_lendingID);
+    msg.sender.transfer(allLendingContracts[_lendingID].totalPremium);
   }
 
   /// @dev                  Allows the original user who borrowed funds to pay the money back
