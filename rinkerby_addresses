@@ -1,0 +1,22 @@
+Using network 'rinkeby'.
+
+Running migration: 2_deploy_contracts.js
+  Deploying JsmnSolLib...
+  ... 0x691c61ee1a75d1d9968e20e5b3595fccd1bc3cd1f5d056ccc2d8ffcf975fe56f
+  JsmnSolLib: 0x04343503f2ac54631619fc69cb05a0e990425ab8
+  Deploying ECMath...
+  ... 0x12001f3c4fb2da5bacbc2c396f40dbcdaac94d8c96f62a465d2f52954dbdb5d9
+  ECMath: 0x251f8a8d0433f3591ecd5bbb7f279bbbab143f06
+  Deploying bytesutils...
+  ... 0xdbe2294ad2a4d43aa410d118980dfc7e90a6c3c75f1f8ab6e3e739d3b99ca65d
+  bytesutils: 0xca168c77882ebc3b928af5029484085a1ab8de7c
+  Linking ECMath to tlsnutils
+  Deploying tlsnutils...
+  ... 0xa5ad2b55d09dfc14697ae4725bd37071fe9c326e5fba95f1bde71f234323329b
+  tlsnutils: 0x0625e16be7866f21d42f81fe16e19604378e6d9f
+  Linking tlsnutils to Lending
+  Deploying Lending...
+  ... 0xbdb37a97bd6041ccb27327d4d3bfd6963a5fae57877e26bcad9c6efe14452e51
+  Lending: 0x922c8794e37d0dd1eefd581a206595c734d6108e
+Saving successful migration to network...
+  ... 0x1ed2fe61a5a9a43928ab8cd87c9036e3f4b0f17e4e2d1381d7aac1caa3a66f0d

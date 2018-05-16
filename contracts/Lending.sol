@@ -225,5 +225,4 @@ contract Lending {
     }
     return false;
   }
-
 }

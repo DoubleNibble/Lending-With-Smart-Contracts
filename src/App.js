@@ -4,8 +4,10 @@ import getWeb3 from './utils/getWeb3'
 import * as interestRates from './interestRates.js'
 
 import {Jumbotron, Button, Navbar, Nav, NavItem, MenuItem, NavDropdown, Well}  from 'react-bootstrap'
-import {Switch, Route, Link} from 'react-router-dom'
-
+import {Switch, Route} from 'react-router-dom'
+import { Icon } from 'react-icons-kit'
+import { ic_account_balance } from 'react-icons-kit/md/ic_account_balance'
+import { IndexLinkContainer, LinkContainer } from 'react-router-bootstrap';
 import './App.css'
 
 // Loan class for client-side representation
@@ -315,23 +317,21 @@ class App extends Component {
 		<Navbar fluid bsStyle="inverse" scrolling>
 			  <Navbar.Header>
 			    <Navbar.Brand>
-			      <a href="/"> InsuranceDApp</a>
+			    <IndexLinkContainer to="/">
+			      <Icon size={20} icon={ic_account_balance} />
+			    </IndexLinkContainer>
 			    </Navbar.Brand>
 			  </Navbar.Header>
 			  <Nav>
-			    <NavItem  eventKey={1} href="/about">
-			      Documentation
-			    </NavItem>
-			  </Nav>
-			  <Nav>
-			    <NavItem  eventKey={2} href="/create_loans">
-			      Create Loans
-			    </NavItem>
-			  </Nav>
-			  <Nav>
-			    <NavItem  eventKey={3} href="/my_loans">
-			      My Loans
-			    </NavItem>
+			  <LinkContainer to="/about">
+			    <NavItem> About </NavItem>
+			  </LinkContainer>
+			  <LinkContainer to="/create_loans">
+			    <NavItem> Create Loans </NavItem>
+			    </LinkContainer>
+			  <LinkContainer to="/my_loans">
+			    <NavItem > My Loans </NavItem>
+			  </LinkContainer>
 			  </Nav>
 			</Navbar>
 
@@ -341,23 +341,24 @@ class App extends Component {
 				<Route exact path ="/" render = {()=>
 					<div>
 						<Jumbotron>
-							<h1>Insurance DApp</h1>
-		       			    <p><strong>Your personal flight loan generator.</strong></p>
-		        			<Button bsStyle="info" bsSize="large" href="/about" >Learn more </Button>
+							<h1>Lending DApp</h1>
 						</Jumbotron>
 						<Well>
-							<p> We decided against having a centralised party providing a pre-determined range of policies that will be available to users. </p>
-							<p>	We felt that this undermined the decentralised nature of using TLS-N and the blockchain. </p>
-							<p>	We decided to allow users to suggest premiums they were willing to pay and other users could decide to fund those contracts. </p>
-							<p>	This is a much more free market, decentralised approach to the problem.</p>
+							<p>This platform would allow users to enter borrow or lending transactions based on a single bid and offer rate, over a standardised period of time. </p>
+							<p>In order to mitigate the risk of default of non-payment, all loans must be collateralised by placing items of sufficient value in the care of a trusted third-party. </p>
+							<p>The third party would then certify the placement of collateral via TLS-N, after which we would ’tokenise’ the collateral and attach it to the lending contract. </p>
+							<p>This would be transferred to the lender in the case of default or non-repayment, or otherwise returned to the borrower. </p>
 						</Well>
 					</div>
 				}/>
 
 				<Route path="/create_loans" render ={()=>
 					<div>
+						<Well bsSize ="small">
+							<h3> Here you can create a new loan. Please fill in the required details.</h3>
+						</Well>
 						<LoanCreator addNewLoan={this.addNewLoan.bind(this)} baseRate={this.state.boeInterestRate}/>
-								     <button onClick={() => {this.addNewAsset(this.state.web3.toWei(1, "ether"))}}>Add New Asset </button>
+						<button onClick={() => {this.addNewAsset(this.state.web3.toWei(1, "ether"))}}>Add New Asset </button>
 
 					</div>
 				}/>
@@ -367,6 +368,9 @@ class App extends Component {
 				   <Well>
 				    <h2>More Information on LendingDApp</h2>
 				    <p> <strong> add more info about this app </strong></p>
+				    <p>We have created a decentralised application on the Ethereum test network (Rinkeby) that allows users to borrow funds against assets they hold. Our smart contract holds records asset ownership, as well as any loans against these assets. 
+				     We use the TLS-N protocol to verify the interest rates that users should be paying on their loans.
+				    </p>
 				    <p>Smart contracts written on the blockchain cannot fetch real world data and must rely on trusted, third-party oracles to request it from the desired source. Currently, these oracles must be trusted to feed the data unedited to the blockchain for use by the requesting contract.</p>
 				    <p>Having the ability to independently verify information would remove the need for trust in third parties while guaranteeing the validity of the data received over the internet. As a result, it would be possible to automatically feed this information into the blockchain ecosystem and execute contracts on the basis of it. TLS-N, an extension to the existing secure web protocol TLS, achieves this goal.</p>
 					<p>It provides a secure, non-repudiable and trivially verifiable proof about the contents (message, time-stamped) of a TLS session, and that the contents have not been tampered with. As a result, users no longer need to trust that oracles or intermediaries have not tampered with data, and can automate the execution of their contracts based on the TLS-N verification.</p>
@@ -377,6 +381,9 @@ class App extends Component {
 
 				<Route path="/my_loans" render ={()=>
 				<div>
+					<Well bsSize ="small">
+						<h3> Here you can observe all your submitted loan requests and their status</h3>
+					</Well>
 					<LoanList loans={this.state.unfundedLoans} header={"Your Unfunded Loans"} buttonAction={this.cancelLoan.bind(this)} buttonText={"Cancel Loan"}/>
 					<LoanList loans={this.state.fundedLoans} header={"Your Funded Loans"} buttonAction={this.repayLoan.bind(this)} buttonText={"Repay Loan"}/>
 					<LoanList loans={this.state.loansMade} header={"Loans You've Made"} buttonAction={this.claimAsset.bind(this)} buttonText={"Claim Asset"}/>
@@ -385,11 +392,6 @@ class App extends Component {
 				}/>
     		</Switch>
 		</div>
-
-		<main className="container">
-
-
-		</main>
 
 		</div>
 		</div>
