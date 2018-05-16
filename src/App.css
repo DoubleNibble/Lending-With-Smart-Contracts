@@ -28,6 +28,13 @@ code {
 
 /* NAVBAR */
 
+
+.jumbotron {
+  color: #0059b3;
+  text-align: center;
+  background-color: transparent;
+}
+
 .navbar {
  // padding: 5px;
   background: #0059b3;
