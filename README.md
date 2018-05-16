@@ -27,7 +27,7 @@ To run the automated tests in our system you will need to type 'truffle test' in
 
 ## Deployment
 
-A live deployment of this contract can be found on the Rinkeby test network at the following address: [](). A live deployment of our site can be found [here]().
+A live deployment of this contract can be found on the Rinkeby test network at the following address: [0x7a9e97b624753b598e0a129a971558ab378824b6](). A live deployment of our site can be found [here]().
 
 ## Built With
 

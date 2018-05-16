@@ -286,7 +286,7 @@ class App extends Component {
     // Cancels a proposed loan
     async cancelLoan(loan) {
 	console.log("cancelling loan " + loan.id)
-	await this.lendingContractInst.cancelLoan( loan.id, {from:this.currAccount});	
+	await this.lendingContractInst.cancelLoan( loan.id, {from:this.currAccount});
     }
 
     // Agree to makes a loan
@@ -304,7 +304,7 @@ class App extends Component {
     // Claim an asset as a result of non-repayement
     async claimAsset(loan) {
 	console.log("claim loan" + loan.id)
-	this.lendingContractInst.reportLatePayment(loan.id)
+	this.lendingContractInst.reportLatePayment(loan.id, {from:this.currAccount})
     }
 
     render() {
@@ -368,7 +368,7 @@ class App extends Component {
 				   <Well>
 				    <h2>More Information on LendingDApp</h2>
 				    <p> <strong> add more info about this app </strong></p>
-				    <p>We have created a decentralised application on the Ethereum test network (Rinkeby) that allows users to borrow funds against assets they hold. Our smart contract holds records asset ownership, as well as any loans against these assets. 
+				    <p>We have created a decentralised application on the Ethereum test network (Rinkeby) that allows users to borrow funds against assets they hold. Our smart contract holds records asset ownership, as well as any loans against these assets.
 				     We use the TLS-N protocol to verify the interest rates that users should be paying on their loans.
 				    </p>
 				    <p>Smart contracts written on the blockchain cannot fetch real world data and must rely on trusted, third-party oracles to request it from the desired source. Currently, these oracles must be trusted to feed the data unedited to the blockchain for use by the requesting contract.</p>

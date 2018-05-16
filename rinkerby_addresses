@@ -1,22 +1,30 @@
 Using network 'rinkeby'.
 
+Running migration: 1_initial_migration.js
+  Deploying Migrations...
+  ... 0xe6635d2059c8f039ce76593c3d438e89d49c24f229908cfb33af36728c76703f
+  Migrations: 0x71b8693673555390ea3d21a5b4d18495e9cde52b
+Saving successful migration to network...
+  ... 0xa7d6e90197032dedbed7b0c03a7ac5aafca2d4ff248be4851f67f506740e0eb1
+Saving artifacts...
 Running migration: 2_deploy_contracts.js
   Deploying JsmnSolLib...
-  ... 0x691c61ee1a75d1d9968e20e5b3595fccd1bc3cd1f5d056ccc2d8ffcf975fe56f
-  JsmnSolLib: 0x04343503f2ac54631619fc69cb05a0e990425ab8
+  ... 0x28663e595437c69c6e34a9132bb64714280a13b3ba8e9caf7c601e5add7dfad4
+  JsmnSolLib: 0x7d4df3a13350fc5c437559ebedd89c13e56f197e
   Deploying ECMath...
-  ... 0x12001f3c4fb2da5bacbc2c396f40dbcdaac94d8c96f62a465d2f52954dbdb5d9
-  ECMath: 0x251f8a8d0433f3591ecd5bbb7f279bbbab143f06
+  ... 0x61114cc5447039cdbd8f29097dbaf59f113748e4ac5b17c3b52f08c00db5b359
+  ECMath: 0x633c2181b93370f0775edbfe60c787719da6abf6
   Deploying bytesutils...
-  ... 0xdbe2294ad2a4d43aa410d118980dfc7e90a6c3c75f1f8ab6e3e739d3b99ca65d
-  bytesutils: 0xca168c77882ebc3b928af5029484085a1ab8de7c
+  ... 0xd62774fc9d9e7db30a737bfab98dc39026b2bb409352d18b508035ac4ea47f13
+  bytesutils: 0x5a0200a1b9cb264a389ce247669398533cf1a7db
   Linking ECMath to tlsnutils
   Deploying tlsnutils...
-  ... 0xa5ad2b55d09dfc14697ae4725bd37071fe9c326e5fba95f1bde71f234323329b
-  tlsnutils: 0x0625e16be7866f21d42f81fe16e19604378e6d9f
+  ... 0x2bff39570ed1a412f1b660ccec64703f7b42ede2d976294ce1a9506bed8caa8c
+  tlsnutils: 0xa0a2a15905358559e4dffbf001ac27f219ae12b0
   Linking tlsnutils to Lending
   Deploying Lending...
-  ... 0xbdb37a97bd6041ccb27327d4d3bfd6963a5fae57877e26bcad9c6efe14452e51
-  Lending: 0x922c8794e37d0dd1eefd581a206595c734d6108e
+  ... 0xe08e048d6f67adc7562e85843f730e3fda07a7bb38a7e06e27b6b858ed3625fd
+  Lending: 0x7a9e97b624753b598e0a129a971558ab378824b6
 Saving successful migration to network...
-  ... 0x1ed2fe61a5a9a43928ab8cd87c9036e3f4b0f17e4e2d1381d7aac1caa3a66f0d
+  ... 0xebb5494777f8d2eb274ff17567e7feb7fcdbbb908abe145bcdf2ece36420d9a3
+Saving artifacts...

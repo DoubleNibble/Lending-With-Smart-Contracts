@@ -95,10 +95,7 @@ contract Lending {
 
     // Check the user has passed in the right premium to match the interest rate
     uint yearly_premium = ((msg.value * 100000 * 52) / _lending_period)/_borrowAmount;
-    Status(yearly_premium);
-    //Status(interest_int);
-    Status(uint(interest_int));
-    //require(yearly_premium > uint(interest_int));
+    require(yearly_premium > uint(interest_int));
 
     // Setup Contract
     uint lendingID = (lendingContractCount++)+1000;
@@ -118,6 +115,7 @@ contract Lending {
     allLendingContracts[_lendingID].acceptor = msg.sender;
     allLendingContracts[_lendingID].startTime = now;
     allLendingContracts[_lendingID].endTime = now + (allLendingContracts[_lendingID].lendingTimePeriod * 1 weeks);
+    LendingContractChange(_lendingID);
   }
 
   /// @dev                  Allows a user to cancel a loan if it has not been funded
@@ -128,8 +126,8 @@ contract Lending {
     require(!allLendingContracts[_lendingID].deleted);
 
     allLendingContracts[_lendingID].deleted = true;
-    LendingContractChange(_lendingID);
     msg.sender.transfer(allLendingContracts[_lendingID].totalPremium);
+    LendingContractChange(_lendingID);
   }
 
   /// @dev                  Allows the original user who borrowed funds to pay the money back
@@ -143,7 +141,6 @@ contract Lending {
     allLendingContracts[_lendingID].acceptor.transfer(msg.value);
     allLendingContracts[_lendingID].deleted = true;
     allAssets[allLendingContracts[_lendingID].collateralAssetID].borrowedAgainst = false;
-    lendingContractCount--;
     LendingContractChange(_lendingID);
   }
 
@@ -178,6 +175,7 @@ contract Lending {
   function transferOwnership(address _recipient, uint _assetID) public {
     require(allAssets[_assetID].owner == msg.sender || msg.sender == master);
     allAssets[_assetID].owner = _recipient;
+    AssetChange(_assetID);
   }
 
   /// @dev                  Allows the owner of the contract to change the value of an asset
@@ -185,6 +183,7 @@ contract Lending {
   /// @param  _new_value    The new value of the asset
   function changeValue(uint _assetID, uint _new_value) public isOwner {
     allAssets[_assetID].value = _new_value;
+    AssetChange(_assetID);
   }
 
   /// @dev       Allows requestor to return all lending IDs
