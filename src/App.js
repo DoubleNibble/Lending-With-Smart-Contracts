@@ -70,7 +70,7 @@ class LoanList extends Component {
 		{columnHeader("ID", idWidth)}
 	    {columnHeader("Asset ID", assetIdWidth)}
 	    {columnHeader("Amount", amountWidth)}
-	    {columnHeader("Interest Premium", interestPremWidth)}
+	    {columnHeader("Total Premium", interestPremWidth)}
 		{this.props.loans.map( function(loan) {
 		    return <div>
 			<LoanView key={loan.id} loan={loan} idWidth={idWidth} assetIdWidth={assetIdWidth} amountWidth={amountWidth} interestPremWidth={interestPremWidth}/>
@@ -114,11 +114,11 @@ class LoanCreator extends Component {
 	return (
 		<div>
 		<input placeholder={"Amount"} onChange={(e) => this.setAmount(e.target.value)}></input>
-		<input placeholder={"Interest Rate Premium"} onChange={(e) => this.setInterest(e.target.value)}></input>
+		<input placeholder={"Total Premium"} onChange={(e) => this.setInterest(e.target.value)}></input>
 		<input placeholder={"Asset ID"} onChange={(e) => this.setAssetID(e.target.value)}></input>
 		<input placeholder={"Time period (weeks)"} onChange={(e) => this.setLendingPeriod(e.target.value)}></input>
 		<p>Requesting a loan for {this.state.amount} with interest rate {this.state.interestRate} to be paid back in {this.state.lendingPeriod} weeks with asset number {this.state.assetID} as collateral</p>
-		<button onClick={() => {this.props.addNewLoan(this.state.amount, this.state.interestRatePremium, this.state.lendingPeriod, this.state.assetID)}}>Request Loan</button>
+		<button onClick={() => {this.props.addNewLoan(this.state.amount, this.state.interestRate, this.state.lendingPeriod, this.state.assetID)}}>Request Loan</button>
 	    </div> )
     }
 }
@@ -169,6 +169,13 @@ class App extends Component {
 		}.bind(this)
 		this.event = this.lendingContractInst.LendingContractChange()
 		return this.event.watch(getLoans)
+	    }).then( (result) => {
+		// Start watching for bet changes with getLoans callback
+		var getLoans = function(a,b) {
+		    console.log("STAT", b.args.a.toNumber())
+		}.bind(this)
+		var event = this.lendingContractInst.Status()
+		return event.watch(getLoans)
 	    }).then( (result) => {
 		// Create a function that regularly checks for changes to account
 		this.currAccount = this.state.web3.eth.accounts[0]
@@ -263,14 +270,15 @@ class App extends Component {
 	console.log(proof)
 	proof = proof.proof
 	this.setState({proof:proof})
-	console.log(assetId)
+	console.log(assetId, this.state.web3.toWei(amount, "ether"))
+	console.log(lendingPeriod, proof, this.state.web3.toWei(premium, "ether"))
 	this.lendingContractInst.borrowFunds(assetId, this.state.web3.toWei(amount, "ether"),
 					     lendingPeriod, proof,
 					     {from:this.currAccount, value:this.state.web3.toWei(premium, "ether")})
     }
 
     async addNewAsset(value) {
-	console.log(this.currAccount);
+	console.log(this.currAccount, value);
 	await this.lendingContractInst.addAsset(this.currAccount, value, {from:this.currAccount});
 	console.log((await this.lendingContractInst.getAssetIds()))
     }

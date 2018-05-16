@@ -55,6 +55,7 @@ contract Lending {
 
   event AssetChange(uint assetID);
   event LendingContractChange(uint lendingID);
+  event Status(uint a);
 
   /***********************************/
   /********* PUBLIC FUNCTIONS ********/
@@ -94,7 +95,10 @@ contract Lending {
 
     // Check the user has passed in the right premium to match the interest rate
     uint yearly_premium = ((msg.value * 100000 * 52) / _lending_period)/_borrowAmount;
-    require(yearly_premium > uint(interest_int));
+    Status(yearly_premium);
+    //Status(interest_int);
+    Status(uint(interest_int));
+    //require(yearly_premium > uint(interest_int));
 
     // Setup Contract
     uint lendingID = (lendingContractCount++)+1000;
