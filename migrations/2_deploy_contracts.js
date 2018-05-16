@@ -16,4 +16,15 @@ module.exports = function(deployer, network) {
     deployer.link(tlsnutils, Lending);
     deployer.deploy(Lending);
   }
+  else if(network == "development"){
+    deployer.deploy(JsmnSolLib, {overwrite: false});
+    deployer.deploy(ECMath, {overwrite: false});
+    deployer.deploy(bytesutils, {overwrite: false});
+    deployer.link(ECMath,tlsnutils);
+    deployer.link(bytesutils,tlsnutils);
+    deployer.deploy(tlsnutils, {overwrite: false});
+    deployer.link(JsmnSolLib, Lending);
+    deployer.link(tlsnutils, Lending);
+    deployer.deploy(Lending);
+  }
 };
