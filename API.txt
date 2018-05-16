@@ -1,4 +1,0 @@
-Key: mzR9A19dDCBBzuBhrNv2
-
-curl "https://www.quandl.com/api/v3/datasets/BOE/IUMAGR2W?api_key=mzR9A19dDCBBzuBhrNv2" - for interest rates
-

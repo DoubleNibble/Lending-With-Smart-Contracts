@@ -90,13 +90,13 @@ class LoanCreator extends Component {
     }
     // The following setters all attempt to parse a number from text and if succesful, set the corresponding attribute
     setInterest(premium) {
-	if (parseFloat(premium)) {
-	    this.setState({interestRate: this.props.baseRate+parseFloat(premium)})
+	if (premium) {
+	    this.setState({interestRate:(premium)})
 	}
     }
     setAmount(amount) {
-	if (parseFloat(amount)) {
-	    this.setState({amount: parseFloat(amount)})
+	if ((amount)) {
+	    this.setState({amount: (amount)})
 	}
     }
     setAssetID(assetID) {
@@ -257,7 +257,7 @@ class App extends Component {
 	var assetID = loanArr[7].toNumber()
 	var filled = loanArr[8]
 	var deleted = loanArr[9]
-	var totalPremium = loanArr[10].toNumber()
+	var totalPremium = this.state.web3.fromWei(loanArr[10].toNumber(), "ether")
 	var loan = new Loan(id, proposer, accepter, timePeriod, amount,
 			    assetID, startTime, endTime, filled, deleted, totalPremium);
 	return loan
