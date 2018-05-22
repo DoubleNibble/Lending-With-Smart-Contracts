@@ -60,6 +60,12 @@ class LoanList extends Component {
 	var columnHeader = function(text, width) {
 	    return (<h4 style={{display:"inline-block", width:width+"px", "text-align":"center"}}>{text}</h4>)
 	}
+
+	if (this.props.loans.length == 0) { 
+		return (<h2>
+				No loans to display
+				</h2>)
+	}
 	// Returns the headers and then a list of LoanViews by mapping the loans list to LoanViews
 	return (
 		<div>

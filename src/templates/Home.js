@@ -8,111 +8,38 @@ export const Home = () => (
 
 
               <section id="intro">
-                <a href="#" className="logo"><img src="images/logo.jpg" alt="" /></a>
+                <a className="logo"><img src="images/money.png" alt="" /></a>
                 <header>
-                  <h2>Lending Distributed</h2>
+                  <h2>Lending Decentralised</h2>
                   <p> Ethereum based lending application </p>
                 </header>
               </section>
 
-              {/*
+
               <section>
                 <div className="mini-posts">
 
-
                     <article className="mini-post">
                       <header>
-                        <h3><a href="#">Vitae sed condimentum</a></h3>
-                        <time className="published" datetime="2015-10-20">October 20, 2015</time>
-                        <a href="#" className="author"><img src="images/avatar.jpg" alt="" /></a>
+                        <h3><a href="/create_loans"> Create a loans request </a></h3>
+                        <time className="published"> and wait for someone to accept it </time>
                       </header>
-                      <a href="#" className="image"><img src="images/pic04.jpg" alt="" /></a>
+                      <a href="/create_loans" className="image"><img src="images/lending.jpg" alt="" /></a>
                     </article>
 
 
                     <article className="mini-post">
                       <header>
-                        <h3><a href="#">Rutrum neque accumsan</a></h3>
-                        <time className="published" datetime="2015-10-19">October 19, 2015</time>
-                        <a href="#" className="author"><img src="images/avatar.jpg" alt="" /></a>
+                        <h3><a href="/proposed"> Accept an existing loan request</a></h3>
+                        <p>TLS-N protocol verifies the interest rates you receive</p>
                       </header>
-                      <a href="#" className="image"><img src="images/pic05.jpg" alt="" /></a>
+                      <a href="/proposed" className="image"><img src="images/keyboard.jpg" alt="" /></a>
                     </article>
 
-
-                    <article className="mini-post">
-                      <header>
-                        <h3><a href="#">Odio congue mattis</a></h3>
-                        <time className="published" datetime="2015-10-18">October 18, 2015</time>
-                        <a href="#" className="author"><img src="images/avatar.jpg" alt="" /></a>
-                      </header>
-                      <a href="#" className="image"><img src="images/pic06.jpg" alt="" /></a>
-                    </article>
-
-
-                    <article className="mini-post">
-                      <header>
-                        <h3><a href="#">Enim nisl veroeros</a></h3>
-                        <time className="published" datetime="2015-10-17">October 17, 2015</time>
-                        <a href="#" className="author"><img src="images/avatar.jpg" alt="" /></a>
-                      </header>
-                      <a href="#" className="image"><img src="images/pic07.jpg" alt="" /></a>
-                    </article>
 
                 </div>
               </section>
 
-
-              <section>
-                <ul className="posts">
-                  <li>
-                    <article>
-                      <header>
-                        <h3><a href="#">Lorem ipsum fermentum ut nisl vitae</a></h3>
-                        <time className="published" datetime="2015-10-20">October 20, 2015</time>
-                      </header>
-                      <a href="#" className="image"><img src="images/pic08.jpg" alt="" /></a>
-                    </article>
-                  </li>
-                  <li>
-                    <article>
-                      <header>
-                        <h3><a href="#">Convallis maximus nisl mattis nunc id lorem</a></h3>
-                        <time className="published" datetime="2015-10-15">October 15, 2015</time>
-                      </header>
-                      <a href="#" className="image"><img src="images/pic09.jpg" alt="" /></a>
-                    </article>
-                  </li>
-                  <li>
-                    <article>
-                      <header>
-                        <h3><a href="#">Euismod amet placerat vivamus porttitor</a></h3>
-                        <time className="published" datetime="2015-10-10">October 10, 2015</time>
-                      </header>
-                      <a href="#" className="image"><img src="images/pic10.jpg" alt="" /></a>
-                    </article>
-                  </li>
-                  <li>
-                    <article>
-                      <header>
-                        <h3><a href="#">Magna enim accumsan tortor cursus ultricies</a></h3>
-                        <time className="published" datetime="2015-10-08">October 8, 2015</time>
-                      </header>
-                      <a href="#" className="image"><img src="images/pic11.jpg" alt="" /></a>
-                    </article>
-                  </li>
-                  <li>
-                    <article>
-                      <header>
-                        <h3><a href="#">Congue ullam corper lorem ipsum dolor</a></h3>
-                        <time className="published" datetime="2015-10-06">October 7, 2015</time>
-                      </header>
-                      <a href="#" className="image"><img src="images/pic12.jpg" alt="" /></a>
-                    </article>
-                  </li>
-                </ul>
-              </section>
- */}
               <section className="blurb">
                 <h2>About</h2>
                 	 <p>We have created a decentralised application on the Ethereum test network (Rinkeby) that allows users to borrow funds against assets they hold. Our smart contract holds records asset ownership, as well as any loans against these assets.
@@ -124,19 +51,65 @@ export const Home = () => (
               </section>
 
 
-              <section id="footer">
-                <ul class="icons">
-                  <li><a href="#" class="fa-twitter"><span class="label">Twitter</span></a></li>
-                  <li><a href="#" class="fa-facebook"><span class="label">Facebook</span></a></li>
-                  <li><a href="#" class="fa-instagram"><span class="label">Instagram</span></a></li>
-                  <li><a href="#" class="fa-rss"><span class="label">RSS</span></a></li>
-                  <li><a href="#" class="fa-envelope"><span class="label">Email</span></a></li>
-                </ul>
-                <p class="copyright">&copy; Untitled. Design: <a href="http://html5up.net">HTML5 UP</a>. Images: <a href="http://unsplash.com">Unsplash</a>.</p>
+              <section className = "container">
+              	
+                <h2 className="major">The Team</h2>
+                 <p>This test product has been developed by a team of students at Imperial College London in order to demonstrate a real-world application of the TLS-N protocol.</p>
+                 
+                 <div className = "row">
+                  <div className="6u 12u(mobile)">
+		                  <section>
+		                  	<h3>  Matthew Morrison </h3>                         
+		                  	<p >Responsible for smart contract and front-end development. 
+		                     <a href="https://github.com/matthewsmorrison" target="_blank"> GitHub </a>
+		                     </p>
+		                  </section>
+		                 
+		                  <section>
+		                  	<h3 className="major"> Bastien Moyroud </h3>
+		                    <p>Responsible for front-end and server-side development.
+		                    <a href="https://github.com/bmoyroud" target="_blank"> GitHub</a>
+		                    </p>
+		                  </section>
+
+		                  <section> 
+		                  	 <h3 className="major"> Mohammed Hussan </h3>
+		                     <p>Responsible for smart contract and front-end development.
+		                        <a href="https://github.com/Mo-Hussain" target="_blank"> GitHub</a>
+		                     </p>
+		                  </section>
+		            </div>
+		            <div className="6u 12u(mobile)">
+		                  <section> 
+		                     <h3 className="major"> Vincent Groff </h3>
+		                     <p>Responsible for smart contract and front-end development.
+		                        <a href="https://github.com/vgroff" target="_blank"> GitHub</a>
+		                     </p>
+		                  </section>
+
+		                  <section> 
+		                      <h3 className="major"> Mike Scott</h3>
+		                      <p>Responsible for server-side development.
+		                         <a href="https://github.com/bmwwilliams1" target="_blank"> GitHub</a>
+		                      </p>
+		                  </section>
+
+		                  <section> 
+		                        <h3 className="major"> Nijat Bakhshaliyev </h3>
+		                        <p>Responsible for front-end development.
+		                          <a href="https://github.com/nijatb" target="_blank"> GitHub</a>
+		                        </p>
+		                  </section>
+                 	</div>
+                  </div>
               </section>
              
-          </section>
 
+              <section id="footer">
+                <p className="copyright">&copy; Lending DApp. Design: <a href="http://html5up.net">HTML5 UP</a>. Images: <a href="http://unsplash.com">Unsplash</a>.</p>
+              </section>
+
+           </section>
 
 
 	</div>
