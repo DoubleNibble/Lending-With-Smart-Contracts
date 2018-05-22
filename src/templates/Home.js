@@ -4,7 +4,7 @@ export const Home = () => (
 
 <div>
 
-          <section id="sidebar">
+          <section>
 
 
               <section id="intro">
@@ -22,7 +22,7 @@ export const Home = () => (
                     <article className="mini-post">
                       <header>
                         <h3><a href="/create_loans"> Create a loans request </a></h3>
-                        <time className="published"> and wait for someone to accept it </time>
+                        <p> and wait for someone to accept it </p>
                       </header>
                       <a href="/create_loans" className="image"><img src="images/lending.jpg" alt="" /></a>
                     </article>
