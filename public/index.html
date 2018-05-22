@@ -1,9 +1,16 @@
 <!doctype html>
+
+
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lending DApp</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="assets/css/main.css" />
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+   
+    <link rel="stylesheet" href="%PUBLIC_URL%/assets/css/main.css" />
+    
     <!--
       Notice the use of %PUBLIC_URL% in the tag above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -13,26 +20,90 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-     
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> 
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> 
-
-    
-    <title>Truffle Box</title>
   </head>
   <body>
+     <!-- <div id="root"></div> -->
+
+
+    <!-- Wrapper -->
+      <div id="wrapper">
+
+        <!-- Header -->
+          <header id="header">
+            <h1><a href="/">Home</a></h1>
+            <nav class="links">
+              <ul>
+                <li><a href="/create_loans">Create Loans</a></li>
+                <li><a href="/faq"> FAQ </a></li>
+              </ul>
+            </nav>
+            <nav class="main">
+              <ul>
+                <li class="menu">
+                  <a class="fa-bars" href="#menu">Loans Menu</a>
+                </li>
+              </ul>
+            </nav>
+          </header>
+
+        <!-- Menu -->
+          <section id="menu">
+
+            <!-- Links -->
+              <section>
+                <h1>Loans Menu</h1>
+                <ul class="links">
+                  <li>
+                    <a href="/funded">
+                      <h3>Funded</h3>
+                      <p>Proceed with a loan</p>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/unfunded">
+                      <h3>Unfunded</h3>
+                      <p>Bad Luck..</p>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/proposed">
+                      <h3>Proposed</h3>
+                      <p> </p>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/submitted">
+                      <h3>Submitted</h3>
+                      <p>Loans you've made</p>
+                    </a>
+                  </li>
+                </ul>
+              </section>
+
+          </section>
+    <!-- React App loaded in div below -->
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+            <!-- Footer -->
+              <section id="footer">
+                <ul class="icons">
+                  <li><a href="#" class="fa-twitter"><span class="label">Twitter</span></a></li>
+                  <li><a href="#" class="fa-facebook"><span class="label">Facebook</span></a></li>
+                  <li><a href="#" class="fa-instagram"><span class="label">Instagram</span></a></li>
+                  <li><a href="#" class="fa-rss"><span class="label">RSS</span></a></li>
+                  <li><a href="#" class="fa-envelope"><span class="label">Email</span></a></li>
+                </ul>
+                <p class="copyright">&copy; Untitled. Design: <a href="http://html5up.net">HTML5 UP</a>. Images: <a href="http://unsplash.com">Unsplash</a>.</p>
+              </section>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+          </section>
 
-      To begin the development, run `npm start`.
-      To create a production bundle, use `npm run build`.
-    -->
+      </div>
+    <!-- Scripts -->
+      <script src="%PUBLIC_URL%/assets/js/jquery.min.js"></script>
+      <script src="%PUBLIC_URL%/assets/js/skel.min.js"></script>
+      <script src="%PUBLIC_URL%/assets/js/util.js"></script>
+      <!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+      <script src="%PUBLIC_URL%/assets/js/main.js"></script>
+
   </body>
 </html>
